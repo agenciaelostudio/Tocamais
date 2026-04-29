@@ -1,0 +1,45 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "bar_owner",
+        "artist",
+        "fan"
+      ],
+      "default": "fan",
+      "description": "User role in the platform"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Profile picture URL"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Short biography"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "city": {
+      "type": "string",
+      "description": "City location"
+    },
+    "state": {
+      "type": "string",
+      "description": "State/Province"
+    },
+    "onboarding_complete": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user completed onboarding"
+    }
+  },
+  "required": [
+    "role"
+  ]
+}

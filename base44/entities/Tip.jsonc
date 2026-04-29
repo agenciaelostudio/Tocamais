@@ -1,0 +1,30 @@
+{
+  "name": "Tip",
+  "type": "object",
+  "properties": {
+    "artist_profile_id": {
+      "type": "string"
+    },
+    "artist_email": {
+      "type": "string"
+    },
+    "fan_email": {
+      "type": "string"
+    },
+    "fan_name": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Tip amount in BRL"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "artist_profile_id",
+    "fan_email",
+    "amount"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Favorite",
+  "type": "object",
+  "properties": {
+    "fan_email": {
+      "type": "string"
+    },
+    "artist_profile_id": {
+      "type": "string"
+    },
+    "artist_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "fan_email",
+    "artist_profile_id"
+  ]
+}

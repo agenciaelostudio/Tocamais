@@ -1,0 +1,39 @@
+{
+  "name": "Venue",
+  "type": "object",
+  "properties": {
+    "owner_email": {
+      "type": "string",
+      "description": "Bar owner email"
+    },
+    "name": {
+      "type": "string",
+      "description": "Venue/bar name"
+    },
+    "description": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "capacity": {
+      "type": "number"
+    },
+    "phone": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_email",
+    "name"
+  ]
+}

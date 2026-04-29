@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --background: 260 10% 4%;
+    --foreground: 0 0% 96%;
+    --card: 260 10% 7%;
+    --card-foreground: 0 0% 96%;
+    --popover: 260 10% 7%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 264 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 87% 51%;
+    --secondary-foreground: 260 10% 4%;
+    --muted: 260 10% 14%;
+    --muted-foreground: 260 5% 55%;
+    --accent: 264 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 260 10% 16%;
+    --input: 260 10% 16%;
+    --ring: 264 100% 50%;
+    --chart-1: 264 100% 50%;
+    --chart-2: 150 87% 51%;
+    --chart-3: 280 70% 60%;
+    --chart-4: 200 80% 55%;
+    --chart-5: 30 90% 60%;
+    --radius: 0.75rem;
+    --sidebar-background: 260 10% 5%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 264 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 10% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 260 10% 16%;
+    --sidebar-ring: 264 100% 50%;
+    --live-indicator: 140 100% 53%;
+    --primary-glow: 264 100% 60%;
+  }
+
+  .dark {
+    --background: 260 10% 4%;
+    --foreground: 0 0% 96%;
+    --card: 260 10% 7%;
+    --card-foreground: 0 0% 96%;
+    --popover: 260 10% 7%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 264 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 87% 51%;
+    --secondary-foreground: 260 10% 4%;
+    --muted: 260 10% 14%;
+    --muted-foreground: 260 5% 55%;
+    --accent: 264 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 260 10% 16%;
+    --input: 260 10% 16%;
+    --ring: 264 100% 50%;
+    --chart-1: 264 100% 50%;
+    --chart-2: 150 87% 51%;
+    --chart-3: 280 70% 60%;
+    --chart-4: 200 80% 55%;
+    --chart-5: 30 90% 60%;
+    --sidebar-background: 260 10% 5%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 264 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 10% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 260 10% 16%;
+    --sidebar-ring: 264 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(260, 10%, 7%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(264, 100%, 50%, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(264, 100%, 50%, 0.5);
+}
+
+@layer components {
+  /* ── Glass Card ── */
+  .glass-card {
+    background: hsla(0 0% 100% / 0.06);
+    border: 1px solid hsla(0 0% 100% / 0.10);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    border-radius: var(--radius);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  :root .glass-card {
+    background: hsla(var(--card) / 0.65);
+    border-color: hsla(var(--border) / 0.5);
+  }
+
+  .glass-card:hover {
+    border-color: hsla(var(--primary) / 0.25);
+    box-shadow: 0 8px 40px -12px hsla(var(--primary) / 0.12);
+    transform: translateY(-1px);
+  }
+
+  /* ── Premium gradient button ── */
+  .btn-gradient {
+    @apply relative inline-flex items-center justify-center font-semibold text-white rounded-2xl;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 20px -4px hsla(var(--primary) / 0.35);
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px -4px hsla(var(--primary) / 0.45);
+  }
+
+  /* ── Live pulse ring ── */
+  .live-ring {
+    @apply relative;
+  }
+
+  .live-ring::before {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    border: 2px solid hsl(var(--live-indicator));
+    animation: live-ring-pulse 2s ease-out infinite;
+  }
+}
+
+@keyframes live-ring-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}

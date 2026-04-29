@@ -1,0 +1,31 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "artist_profile_id": {
+      "type": "string"
+    },
+    "fan_email": {
+      "type": "string"
+    },
+    "fan_name": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "description": "1-5 stars"
+    },
+    "comment": {
+      "type": "string"
+    },
+    "event_id": {
+      "type": "string",
+      "description": "Optional reference to event"
+    }
+  },
+  "required": [
+    "artist_profile_id",
+    "fan_email",
+    "rating"
+  ]
+}

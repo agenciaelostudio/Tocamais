@@ -1,0 +1,97 @@
+{
+  "name": "ArtistProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User entity"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Artist email for lookups"
+    },
+    "stage_name": {
+      "type": "string",
+      "description": "Artist stage/band name"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Artist biography"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Profile photo"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Cover/banner photo"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Musical genres"
+    },
+    "performance_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "e.g. Voz e Viol\u00e3o, Dupla, Trio, Banda Completa"
+    },
+    "base_price": {
+      "type": "number",
+      "description": "Base price (cach\u00ea) in BRL"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "avg_rating": {
+      "type": "number",
+      "default": 0,
+      "description": "Average star rating"
+    },
+    "total_reviews": {
+      "type": "number",
+      "default": 0
+    },
+    "total_tips": {
+      "type": "number",
+      "default": 0,
+      "description": "Total tips received in BRL"
+    },
+    "available_days": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Days of week available"
+    },
+    "social_links": {
+      "type": "object",
+      "properties": {
+        "instagram": {
+          "type": "string"
+        },
+        "youtube": {
+          "type": "string"
+        },
+        "spotify": {
+          "type": "string"
+        }
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "user_email",
+    "stage_name"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "name": "Proposal",
+  "type": "object",
+  "properties": {
+    "venue_id": {
+      "type": "string",
+      "description": "Reference to Venue"
+    },
+    "venue_name": {
+      "type": "string"
+    },
+    "artist_profile_id": {
+      "type": "string",
+      "description": "Reference to ArtistProfile"
+    },
+    "artist_name": {
+      "type": "string"
+    },
+    "artist_email": {
+      "type": "string"
+    },
+    "bar_owner_email": {
+      "type": "string"
+    },
+    "event_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "e.g. 20:00"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "e.g. 23:00"
+    },
+    "offered_price": {
+      "type": "number",
+      "description": "Price offered in BRL"
+    },
+    "message": {
+      "type": "string",
+      "description": "Message from bar owner"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "artist_response": {
+      "type": "string",
+      "description": "Response message from artist"
+    },
+    "performance_type": {
+      "type": "string",
+      "description": "Type of performance requested"
+    }
+  },
+  "required": [
+    "venue_id",
+    "artist_profile_id",
+    "event_date",
+    "offered_price"
+  ]
+}
