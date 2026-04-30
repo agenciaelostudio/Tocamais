@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { MusicCombobox } from "@/components/MusicCombobox";
-import { Copy, Check, QrCode, Clock, Loader2, ArrowLeft, ArrowRight, CheckCircle2, Music } from "lucide-react";
+import { Copy, Check, QrCode, Clock, Loader2, ArrowLeft, ArrowRight, CheckCircle2, Music, Sparkles, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { generatePixPayload, generatePixQRCodeDataUrl } from "@/lib/pix-qr-generator";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function TwoStepPixPaymentDialog({
   open,
@@ -156,8 +157,6 @@ export function TwoStepPixPaymentDialog({
 
       const { error } = await supabase.from("pedidos").insert(insertData);
       if (error) {
-        // If pedidos table doesn't exist, we might be using proposals or something else
-        // For now, let's assume it exists as per Tocamais project
         console.error("Error inserting pedido:", error);
       }
 
@@ -179,7 +178,6 @@ export function TwoStepPixPaymentDialog({
 
     setConfirmingPix(true);
     try {
-      // In maismais, we might use the 'tips' table instead of RPC
       const { error } = await supabase.from("tips").insert({
         artist_profile_id: artistaId,
         fan_name: clienteNome,
@@ -200,181 +198,253 @@ export function TwoStepPixPaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        {step === 'pedido' ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Music className="w-5 h-5 text-primary" />
-                Pedir música para {artistaNome}
-              </DialogTitle>
-              <DialogDescription>
-                Etapa 1 de 2: Faça seu pedido musical
-              </DialogDescription>
-            </DialogHeader>
+      <DialogContent className="max-w-md p-0 overflow-hidden border-none bg-black/40 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl">
+        {/* Background Cinematic Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-primary/20 rounded-full blur-[80px] animate-pulse" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-secondary/10 rounded-full blur-[80px]" />
+        </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="clienteNome">Seu nome *</Label>
-                <Input
-                  id="clienteNome"
-                  placeholder="Ex: João da mesa 5"
-                  value={clienteNome}
-                  onChange={(e) => setClienteNome(e.target.value)}
-                />
-              </div>
-
-              {musicas.length > 0 ? (
-                !musicaCustomizada ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="pedidoMusica-select">Escolha uma música (opcional)</Label>
-                    <MusicCombobox
-                      open={openMusicCombobox}
-                      onOpenChange={setOpenMusicCombobox}
-                      items={musicas}
-                      selectedTitle={pedidoMusica}
-                      onSelectTitle={setPedidoMusica}
-                      forceDrawer
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-2 text-sm border-primary text-primary hover:bg-primary/10"
-                      onClick={() => {
-                        setMusicaCustomizada(true);
-                        setPedidoMusica("");
-                      }}
-                    >
-                      Ou digite outra música
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="pedidoMusica">
-                      Música *
-                      <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        className="ml-2 h-auto p-0"
-                        onClick={() => {
-                          setMusicaCustomizada(false);
-                          setPedidoMusica("");
-                        }}
-                      >
-                        Ver repertório
-                      </Button>
-                    </Label>
-                    <Input
-                      id="pedidoMusica"
-                      placeholder="Nome da música ou artista"
-                      value={pedidoMusica}
-                      onChange={(e) => setPedidoMusica(e.target.value)}
-                    />
-                  </div>
-                )
-              ) : (
+        <div className="relative z-10 p-8 space-y-6">
+          <AnimatePresence mode="wait">
+            {step === 'pedido' ? (
+              <motion.div
+                key="step-pedido"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
                 <div className="space-y-2">
-                  <Label htmlFor="pedidoMusica">Música (opcional)</Label>
-                  <Input
-                    id="pedidoMusica"
-                    placeholder="Nome da música ou artista"
-                    value={pedidoMusica}
-                    onChange={(e) => setPedidoMusica(e.target.value)}
-                  />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-primary/20 rounded-2xl">
+                      <Music className="w-6 h-6 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-heading font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+                      Pedir música
+                    </h2>
+                  </div>
+                  <p className="text-muted-foreground text-sm pl-1">
+                    Faça seu pedido para <span className="text-primary font-medium">{artistaNome}</span>
+                  </p>
                 </div>
-              )}
 
-              <div className="space-y-2">
-                <Label htmlFor="pedidoMensagem">Dedicatória (opcional)</Label>
-                <Textarea
-                  id="pedidoMensagem"
-                  placeholder="Adicione uma dedicatória especial..."
-                  value={pedidoMensagem}
-                  onChange={(e) => setPedidoMensagem(e.target.value)}
-                  rows={2}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2 pt-2">
-                <Button
-                  onClick={handleCriarPedido}
-                  disabled={creatingPedido || !clienteNome.trim()}
-                  className="w-full"
-                >
-                  {creatingPedido ? "Enviando..." : "Avançar"}
-                </Button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <QrCode className="w-5 h-5 text-primary" />
-                Enviar gorjeta via PIX
-              </DialogTitle>
-              <DialogDescription>
-                Etapa 2 de 2: Envie uma gorjeta para {artistaNome}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="valorGorjetaPix" className="text-base font-medium">
-                  Qual valor da gorjeta?
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-muted-foreground">R$</span>
-                  <Input
-                    id="valorGorjetaPix"
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0,00"
-                    value={valorGorjeta}
-                    onChange={handleValorChange}
-                    className="text-2xl font-bold pl-10 h-14 text-center"
-                  />
-                </div>
-              </div>
-
-              {parseCurrencyToNumber(valorGorjeta) >= 1 && (
-                <div className="flex flex-col items-center gap-3">
-                  {generatingQr ? (
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  ) : dynamicQrCode ? (
-                    <img
-                      src={dynamicQrCode}
-                      alt="QR Code PIX"
-                      className="w-40 h-40 object-contain"
+                <div className="space-y-5">
+                  <div className="space-y-2.5">
+                    <Label htmlFor="clienteNome" className="text-white/80 font-medium ml-1">Seu nome</Label>
+                    <Input
+                      id="clienteNome"
+                      placeholder="Ex: João da mesa 5"
+                      value={clienteNome}
+                      onChange={(e) => setClienteNome(e.target.value)}
+                      className="h-12 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 focus:border-primary transition-all text-white placeholder:text-white/20"
                     />
-                  ) : null}
-                  
-                  {pixCopiaCola && (
-                    <div className="flex gap-2 w-full">
-                      <Input value={pixCopiaCola} readOnly className="font-mono text-xs truncate" />
-                      <Button variant="outline" size="icon" onClick={handleCopyPixCode}>
-                        {copiedCode ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                      </Button>
+                  </div>
+
+                  {musicas.length > 0 ? (
+                    !musicaCustomizada ? (
+                      <div className="space-y-2.5">
+                        <Label className="text-white/80 font-medium ml-1">Escolha no repertório</Label>
+                        <MusicCombobox
+                          open={openMusicCombobox}
+                          onOpenChange={setOpenMusicCombobox}
+                          items={musicas}
+                          selectedTitle={pedidoMusica}
+                          onSelectTitle={setPedidoMusica}
+                          forceDrawer
+                        />
+                        <button
+                          type="button"
+                          className="w-full mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1 font-medium"
+                          onClick={() => {
+                            setMusicaCustomizada(true);
+                            setPedidoMusica("");
+                          }}
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          Ou peça uma música fora da lista
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        <Label htmlFor="pedidoMusica" className="text-white/80 font-medium ml-1 flex justify-between">
+                          Música
+                          <button
+                            type="button"
+                            className="text-xs text-primary hover:underline"
+                            onClick={() => {
+                              setMusicaCustomizada(false);
+                              setPedidoMusica("");
+                            }}
+                          >
+                            Ver repertório
+                          </button>
+                        </Label>
+                        <Input
+                          id="pedidoMusica"
+                          placeholder="Nome da música ou artista"
+                          value={pedidoMusica}
+                          onChange={(e) => setPedidoMusica(e.target.value)}
+                          className="h-12 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 focus:border-primary transition-all text-white placeholder:text-white/20"
+                        />
+                      </div>
+                    )
+                  ) : (
+                    <div className="space-y-2.5">
+                      <Label htmlFor="pedidoMusica" className="text-white/80 font-medium ml-1">Música</Label>
+                      <Input
+                        id="pedidoMusica"
+                        placeholder="Nome da música ou artista"
+                        value={pedidoMusica}
+                        onChange={(e) => setPedidoMusica(e.target.value)}
+                        className="h-12 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 focus:border-primary transition-all text-white placeholder:text-white/20"
+                      />
                     </div>
                   )}
-                </div>
-              )}
 
-              <div className="flex flex-col gap-2 pt-2">
-                <Button
-                  onClick={handleConfirmPixPayment}
-                  disabled={confirmingPix || !valorGorjeta || parseCurrencyToNumber(valorGorjeta) < 1}
-                  className="w-full"
-                >
-                  {confirmingPix ? "Confirmando..." : "Já fiz o PIX"}
-                </Button>
-                <Button variant="outline" onClick={() => setStep('pedido')}>Voltar</Button>
-              </div>
-            </div>
-          </>
-        )}
+                  <div className="space-y-2.5">
+                    <Label htmlFor="pedidoMensagem" className="text-white/80 font-medium ml-1">Dedicatória (opcional)</Label>
+                    <Textarea
+                      id="pedidoMensagem"
+                      placeholder="Adicione uma dedicatória especial..."
+                      value={pedidoMensagem}
+                      onChange={(e) => setPedidoMensagem(e.target.value)}
+                      rows={3}
+                      className="bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 focus:border-primary transition-all text-white placeholder:text-white/20 resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Button
+                    onClick={handleCriarPedido}
+                    disabled={creatingPedido || !clienteNome.trim()}
+                    className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {creatingPedido ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        Avançar para Pagamento <ArrowRight className="w-5 h-5" />
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="step-pagamento"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <div className="space-y-2 text-center">
+                  <div className="inline-flex p-3 bg-secondary/20 rounded-2xl mb-2">
+                    <Heart className="w-8 h-8 text-secondary fill-secondary/20" />
+                  </div>
+                  <h2 className="text-2xl font-heading font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+                    Apoie o Artista
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    Sua gorjeta incentiva <span className="text-secondary font-medium">{artistaNome}</span>
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-white/80 font-medium text-center block w-full">Valor da Gorjeta</Label>
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-secondary/10 rounded-3xl blur-xl group-hover:bg-secondary/20 transition-all" />
+                      <div className="relative">
+                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-bold text-secondary">R$</span>
+                        <Input
+                          id="valorGorjetaPix"
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="0,00"
+                          value={valorGorjeta}
+                          onChange={handleValorChange}
+                          className="h-20 bg-white/10 border-white/10 rounded-[2rem] text-4xl font-bold text-center pl-12 focus:ring-secondary/50 focus:border-secondary text-white transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {parseCurrencyToNumber(valorGorjeta) >= 1 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="flex flex-col items-center gap-5 p-6 bg-white/5 rounded-[2rem] border border-white/10"
+                      >
+                        <div className="relative p-3 bg-white rounded-2xl shadow-2xl">
+                          {generatingQr ? (
+                            <div className="w-40 h-40 flex items-center justify-center">
+                              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                            </div>
+                          ) : dynamicQrCode ? (
+                            <img
+                              src={dynamicQrCode}
+                              alt="QR Code PIX"
+                              className="w-40 h-40 object-contain"
+                            />
+                          ) : (
+                            <div className="w-40 h-40 flex items-center justify-center text-muted-foreground text-xs text-center p-4">
+                              Erro ao gerar QR Code
+                            </div>
+                          )}
+                        </div>
+                        
+                        {pixCopiaCola && (
+                          <div className="flex gap-2 w-full max-w-[280px]">
+                            <div className="flex-1 bg-black/40 rounded-xl px-4 py-3 border border-white/5 truncate font-mono text-[10px] text-white/60">
+                              {pixCopiaCola}
+                            </div>
+                            <Button
+                              variant="secondary"
+                              size="icon"
+                              onClick={handleCopyPixCode}
+                              className="shrink-0 h-10 w-10 rounded-xl bg-secondary hover:bg-secondary/80 text-secondary-foreground shadow-lg"
+                            >
+                              {copiedCode ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                            </Button>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                          <Clock className="w-3 h-3" /> Pagamento instantâneo via PIX
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2">
+                  <Button
+                    onClick={handleConfirmPixPayment}
+                    disabled={confirmingPix || !valorGorjeta || parseCurrencyToNumber(valorGorjeta) < 1}
+                    className="h-14 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold rounded-2xl shadow-lg shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {confirmingPix ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      "Já realizei o pagamento"
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setStep('pedido')}
+                    className="text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                  >
+                    Voltar para o pedido
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, DollarSign, Link2, RefreshCcw } from 'lucide-react';
@@ -483,206 +483,283 @@ export default function Events({ user }) {
   }, [calendarEventDays, googleBusyDateSet, isArtist, today]);
 
   return (
-    <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-heading font-bold">Agenda</h1>
-          <p className="text-muted-foreground mt-1">
-            {user?.role === 'fan' ? 'Próximos shows' : 'Seus shows agendados'}
-          </p>
-        </div>
-        <Tabs value={view} onValueChange={setView}>
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="list">Lista</TabsTrigger>
-            <TabsTrigger value="calendar">Calendário</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </motion.div>
+    <div className="min-h-screen bg-background relative overflow-hidden -mt-6 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 py-8 md:py-12">
+      {/* Background Decorative Elements */}
+      <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-[40%] h-[40%] bg-secondary/10 blur-[100px] rounded-full pointer-events-none -z-10" />
 
-      {view === 'calendar' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-card border border-border rounded-xl p-6">
-          {isArtist && (
-            <div className="mb-5 rounded-xl border border-border bg-muted/20 p-4">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold flex items-center gap-2">
-                    <CheckCircle2 size={16} className="text-emerald-600" />
-                    Disponibilidade anual do artista
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Clique nos dias do calendario para marcar quando voce esta disponivel.
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {availableDates.length} dia(s) selecionado(s).
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={handleConnectGoogleCalendar}
-                    disabled={!isGoogleCalendarConfigured || syncGoogleMutation.isPending}
-                  >
-                    <Link2 size={14} className="mr-2" />
-                    {isGoogleConnected ? 'Reconectar Google' : 'Conectar Google Agenda'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => loadGoogleBusyDaysForYear(currentMonth.getFullYear()).catch((error) => {
-                      toast.error(error.message || 'Nao foi possivel atualizar os dias ocupados do Google.');
-                    })}
-                    disabled={!isGoogleConnected || isLoadingGoogleBusyDates || syncGoogleMutation.isPending}
-                  >
-                    <RefreshCcw size={14} className="mr-2" />
-                    {isLoadingGoogleBusyDates ? 'Atualizando...' : 'Atualizar indisponiveis'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleSaveAvailability}
-                    disabled={saveAvailabilityMutation.isPending || !artistProfile?.id || isLoadingArtistProfile}
-                  >
-                    {saveAvailabilityMutation.isPending ? 'Salvando...' : 'Salvar disponibilidade'}
-                  </Button>
-                  <Button
-                    onClick={handleSyncWithGoogle}
-                    disabled={
-                      !isGoogleCalendarConfigured
-                      || !artistProfile?.id
-                      || isLoadingArtistProfile
-                      || saveAvailabilityMutation.isPending
-                      || syncGoogleMutation.isPending
-                    }
-                  >
-                    {syncGoogleMutation.isPending ? 'Sincronizando...' : 'Sincronizar com Google'}
-                  </Button>
-                </div>
-              </div>
-              {!isGoogleCalendarConfigured && (
-                <p className="text-xs text-amber-600 mt-3">
-                  Defina `VITE_GOOGLE_CLIENT_ID` para ativar a sincronizacao com a Google Agenda.
-                </p>
-              )}
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-12 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-10 h-1 bg-gradient-to-r from-primary to-secondary rounded-full" />
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary/80">Cronograma</span>
             </div>
-          )}
-
-          <div className="flex items-center justify-between mb-4">
-            <Button variant="ghost" size="icon" onClick={() => setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1))}>
-              <ChevronLeft size={18} />
-            </Button>
-            <h2 className="font-heading font-bold text-lg capitalize">
-              {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
-            </h2>
-            <Button variant="ghost" size="icon" onClick={() => setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1))}>
-              <ChevronRight size={18} />
-            </Button>
+            <h1 className="text-4xl md:text-5xl font-heading font-black tracking-tight text-foreground">
+              Sua <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Agenda</span>
+            </h1>
+            <p className="text-muted-foreground mt-3 text-lg max-w-lg leading-relaxed font-medium">
+              {user?.role === 'fan' ? 'Acompanhe os próximos shows e não perca nenhuma batida.' : 'Gerencie seus compromissos e disponibilidade em um só lugar.'}
+            </p>
           </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
-            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d) => (
-              <div key={d} className="py-1">{d}</div>
-            ))}
+          <div className="bg-card/40 backdrop-blur-md border border-white/5 p-1.5 rounded-2xl shadow-xl">
+            <Tabs value={view} onValueChange={setView}>
+              <TabsList className="bg-transparent border-0 gap-1">
+                <TabsTrigger value="list" className="rounded-xl px-6 data-[state=active]:bg-background/80 font-bold">Lista</TabsTrigger>
+                <TabsTrigger value="calendar" className="rounded-xl px-6 data-[state=active]:bg-background/80 font-bold">Calendário</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
-          <div className="grid grid-cols-7 gap-1">
-            {Array(startPadding).fill(null).map((_, i) => <div key={`pad-${i}`} />)}
-            {days.map((day) => {
-              const dayEvents = events.filter((e) => e.event_date && isSameDay(parseISO(e.event_date), day));
-              const isoDate = format(day, 'yyyy-MM-dd');
-              const isAvailable = availableDateSet.has(isoDate);
-              const isGoogleBusy = googleBusyDateSet.has(isoDate);
-              const hasScheduledEvent = calendarEventDays.has(isoDate);
-              const isPastDay = isBefore(day, today);
-
-              const isToggleDisabled = !isArtist || isPastDay || hasScheduledEvent || isGoogleBusy;
-
-              const dayStyle = `p-2 rounded-lg text-center min-h-[76px] transition-colors border ${
-                isAvailable
-                  ? 'bg-emerald-500/10 border-emerald-500/40'
-                  : hasScheduledEvent
-                    ? 'bg-secondary/10 border-secondary/30'
-                    : isGoogleBusy
-                      ? 'bg-destructive/10 border-destructive/30'
-                      : isToday(day)
-                        ? 'bg-primary/10 border-primary/30'
-                        : 'border-transparent hover:bg-muted'
-              } ${isPastDay ? 'opacity-60' : ''}`;
-
-              return (
-                <button
-                  type="button"
-                  key={day.toISOString()}
-                  className={dayStyle}
-                  onClick={() => toggleAvailabilityDate(day)}
-                  disabled={isToggleDisabled}
-                >
-                  <span className={`text-sm ${isToday(day) ? 'text-primary font-bold' : ''}`}>{format(day, 'd')}</span>
-                  {isArtist && isAvailable && (
-                    <div className="mt-1 px-1 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-700 truncate">
-                      Disponivel
-                    </div>
-                  )}
-                  {isArtist && isGoogleBusy && !isAvailable && (
-                    <div className="mt-1 px-1 py-0.5 rounded text-[10px] bg-destructive/20 text-destructive truncate">
-                      Google ocupado
-                    </div>
-                  )}
-                  {dayEvents.map((e) => (
-                    <div key={e.id} className="mt-1 px-1 py-0.5 rounded text-xs bg-secondary/20 text-secondary truncate">
-                      {e.artist_name || e.venue_name}
-                    </div>
-                  ))}
-                </button>
-              );
-            })}
-          </div>
-
-          {isArtist && (
-            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" /> Disponivel</span>
-              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-destructive/20 border border-destructive/40" /> Ocupado no Google</span>
-              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-secondary/20 border border-secondary/40" /> Show agendado</span>
-            </div>
-          )}
         </motion.div>
-      )}
 
-      {view === 'list' && (
-        <div className="space-y-3">
-          {isLoading ? (
-            Array(3).fill(0).map((_, i) => <div key={i} className="h-24 rounded-xl bg-card border border-border animate-pulse" />)
-          ) : events.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="text-lg font-medium">Nenhum evento</p>
+        {view === 'calendar' && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            className="rounded-[2.5rem] bg-card/40 border border-white/5 backdrop-blur-xl p-8 md:p-12 shadow-2xl"
+          >
+            {isArtist && (
+              <div className="mb-10 rounded-3xl border border-white/5 bg-white/5 p-6 md:p-8">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  <div className="space-y-1">
+                    <p className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-emerald-400">
+                      <CheckCircle2 size={16} />
+                      Disponibilidade do Artista
+                    </p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Selecione os dias para sinalizar quando você está livre para contratações.
+                    </p>
+                    <p className="text-xs font-bold text-primary mt-2">
+                      {availableDates.length} dia(s) selecionado(s) este ano.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={handleConnectGoogleCalendar}
+                      disabled={!isGoogleCalendarConfigured || syncGoogleMutation.isPending}
+                      className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 h-12 font-bold"
+                    >
+                      <Link2 size={14} className="mr-2" />
+                      {isGoogleConnected ? 'Reconectar Google' : 'Conectar Google'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => loadGoogleBusyDaysForYear(currentMonth.getFullYear()).catch((error) => {
+                        toast.error(error.message || 'Nao foi possivel atualizar os dias ocupados do Google.');
+                      })}
+                      disabled={!isGoogleConnected || isLoadingGoogleBusyDates || syncGoogleMutation.isPending}
+                      className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 h-12 font-bold"
+                    >
+                      <RefreshCcw size={14} className={`mr-2 ${isLoadingGoogleBusyDates ? 'animate-spin' : ''}`} />
+                      {isLoadingGoogleBusyDates ? 'Sincronizando...' : 'Atualizar Google'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleSaveAvailability}
+                      disabled={saveAvailabilityMutation.isPending || !artistProfile?.id || isLoadingArtistProfile}
+                      className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 h-12 font-bold"
+                    >
+                      {saveAvailabilityMutation.isPending ? 'Salvando...' : 'Salvar Local'}
+                    </Button>
+                    <Button
+                      onClick={handleSyncWithGoogle}
+                      disabled={
+                        !isGoogleCalendarConfigured
+                        || !artistProfile?.id
+                        || isLoadingArtistProfile
+                        || saveAvailabilityMutation.isPending
+                        || syncGoogleMutation.isPending
+                      }
+                      className="rounded-xl bg-primary hover:bg-primary/90 h-12 font-black shadow-lg shadow-primary/20"
+                    >
+                      {syncGoogleMutation.isPending ? 'Sincronizando...' : 'Sincronizar Google'}
+                    </Button>
+                  </div>
+                </div>
+                {!isGoogleCalendarConfigured && (
+                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mt-4 text-center border-t border-white/5 pt-4">
+                    ⚠️ Defina `VITE_GOOGLE_CLIENT_ID` para ativar a sincronização.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between mb-10">
+              <Button variant="ghost" size="icon" onClick={() => setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1))} className="h-12 w-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5">
+                <ChevronLeft size={24} />
+              </Button>
+              <h2 className="font-heading font-black text-3xl capitalize tracking-tight text-foreground">
+                {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
+              </h2>
+              <Button variant="ghost" size="icon" onClick={() => setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1))} className="h-12 w-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5">
+                <ChevronRight size={24} />
+              </Button>
             </div>
-          ) : (
-            events.map((e, i) => (
-              <motion.div
-                key={e.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-all"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex flex-col items-center justify-center">
-                      <span className="text-lg font-bold leading-none">{e.event_date && format(parseISO(e.event_date), 'dd')}</span>
-                      <span className="text-xs text-muted-foreground uppercase">{e.event_date && format(parseISO(e.event_date), 'MMM', { locale: ptBR })}</span>
+
+            <div className="grid grid-cols-7 gap-3 text-center text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-6 px-2">
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d) => (
+                <div key={d} className="py-2">{d}</div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-3">
+              {Array(startPadding).fill(null).map((_, i) => <div key={`pad-${i}`} />)}
+              {days.map((day) => {
+                const dayEvents = events.filter((e) => e.event_date && isSameDay(parseISO(e.event_date), day));
+                const isoDate = format(day, 'yyyy-MM-dd');
+                const isAvailable = availableDateSet.has(isoDate);
+                const isGoogleBusy = googleBusyDateSet.has(isoDate);
+                const hasScheduledEvent = calendarEventDays.has(isoDate);
+                const isPastDay = isBefore(day, today);
+
+                const isToggleDisabled = !isArtist || isPastDay || hasScheduledEvent || isGoogleBusy;
+
+                const dayStyle = `group/day relative p-3 rounded-[1.5rem] text-center min-h-[100px] transition-all duration-300 border flex flex-col items-center justify-start ${
+                  isAvailable
+                    ? 'bg-emerald-500/10 border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.1)]'
+                    : hasScheduledEvent
+                      ? 'bg-primary/10 border-primary/40 shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]'
+                      : isGoogleBusy
+                        ? 'bg-red-500/10 border-red-500/30'
+                        : isToday(day)
+                          ? 'bg-white/10 border-white/20'
+                          : 'border-white/5 hover:border-white/20 hover:bg-white/5'
+                } ${isPastDay ? 'opacity-40 grayscale-[0.5]' : ''}`;
+
+                return (
+                  <button
+                    type="button"
+                    key={day.toISOString()}
+                    className={dayStyle}
+                    onClick={() => toggleAvailabilityDate(day)}
+                    disabled={isToggleDisabled}
+                  >
+                    <span className={`text-lg font-black tracking-tight mb-2 ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
+                      {format(day, 'd')}
+                    </span>
+
+                    <div className="w-full space-y-1 mt-auto">
+                      {isArtist && isAvailable && (
+                        <div className="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                          Disponível
+                        </div>
+                      )}
+                      {isArtist && isGoogleBusy && !isAvailable && (
+                        <div className="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest bg-red-500/20 text-red-400">
+                          Google
+                        </div>
+                      )}
+                      {dayEvents.map((e) => (
+                        <div key={e.id} className="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 truncate">
+                          {isArtist ? e.venue_name : e.artist_name}
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <p className="font-heading font-bold">{isArtist ? e.venue_name : e.artist_name}</p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1 flex-wrap">
-                        {e.start_time && <span className="flex items-center gap-1"><Clock size={10} /> {e.start_time} - {e.end_time}</span>}
-                        {e.price && <span className="flex items-center gap-1"><DollarSign size={10} /> R$ {e.price.toLocaleString('pt-BR')}</span>}
-                        {e.performance_type && <span>{e.performance_type}</span>}
+                    
+                    {isToday(day) && <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-primary" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {isArtist && (
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 border-t border-white/5 pt-8">
+                <span className="flex items-center gap-3"><span className="w-4 h-4 rounded-lg bg-emerald-500/20 border border-emerald-500/50" /> Disponível</span>
+                <span className="flex items-center gap-3"><span className="w-4 h-4 rounded-lg bg-red-500/10 border border-red-500/30" /> Ocupado Google</span>
+                <span className="flex items-center gap-3"><span className="w-4 h-4 rounded-lg bg-primary/20 border border-primary/40" /> Show Agendado</span>
+                <span className="flex items-center gap-3"><span className="w-4 h-4 rounded-lg bg-white/10 border border-white/20" /> Hoje</span>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {view === 'list' && (
+          <div className="space-y-6">
+            <AnimatePresence mode="popLayout">
+              {isLoading ? (
+                Array(4).fill(0).map((_, i) => (
+                  <div key={i} className="h-32 rounded-[2rem] bg-card/40 border border-white/5 animate-pulse" />
+                ))
+              ) : events.length === 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-32 rounded-[3rem] bg-white/5 border border-dashed border-white/10"
+                >
+                  <div className="w-20 h-20 bg-primary/10 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 border border-primary/20">
+                    <Calendar className="w-10 h-10 text-primary opacity-40" />
+                  </div>
+                  <h3 className="text-2xl font-black mb-2 tracking-tight uppercase">Sua agenda está livre</h3>
+                  <p className="text-muted-foreground font-medium max-w-xs mx-auto">Não há eventos agendados para este período.</p>
+                </motion.div>
+              ) : (
+                events.map((e, i) => (
+                  <motion.div
+                    key={e.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="group relative rounded-[2.5rem] bg-card/40 border border-white/5 backdrop-blur-xl p-8 shadow-2xl hover:border-primary/30 transition-all duration-500 overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+                    
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+                      <div className="flex items-center gap-8">
+                        <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-br from-primary/20 to-secondary/20 flex flex-col items-center justify-center border border-white/10 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                          <span className="text-2xl font-black font-heading leading-none text-primary">
+                            {e.event_date && format(parseISO(e.event_date), 'dd')}
+                          </span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1">
+                            {e.event_date && format(parseISO(e.event_date), 'MMM', { locale: ptBR })}
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <h3 className="font-heading font-black text-2xl tracking-tight group-hover:text-primary transition-colors">
+                            {isArtist ? e.venue_name || 'Estabelecimento' : e.artist_name || 'Artista'}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                            {e.start_time && (
+                              <div className="flex items-center gap-2 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                                <Clock size={14} className="text-primary" /> 
+                                {e.start_time} {e.end_time ? `- ${e.end_time}` : ''}
+                              </div>
+                            )}
+                            {e.price && (
+                              <div className="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-widest">
+                                <DollarSign size={14} /> 
+                                R$ {e.price.toLocaleString('pt-BR')}
+                              </div>
+                            )}
+                            {e.performance_type && (
+                              <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                                {e.performance_type}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        <StatusBadge status={e.status} />
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 opacity-0 group-hover:opacity-100 transition-all">
+                          <ChevronRight size={20} />
+                        </Button>
                       </div>
                     </div>
-                  </div>
-                  <StatusBadge status={e.status} />
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
-      )}
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
     </div>
   );
+
 }

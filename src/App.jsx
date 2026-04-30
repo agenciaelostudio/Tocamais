@@ -19,7 +19,8 @@ import Favorites from '@/pages/Favorites';
 import ArtistProfileEdit from '@/pages/ArtistProfileEdit';
 import VenueEdit from '@/pages/VenueEdit';
 import Chat from '@/pages/Chat';
-import Marketplace from '@/pages/Marketplace';
+import Hire from '@/pages/Marketplace';
+import HireProfile from '@/pages/HireProfile';
 import MyReviews from '@/pages/MyReviews';
 import Notifications from '@/pages/Notifications';
 import Settings from '@/pages/Settings';
@@ -68,7 +69,8 @@ const AuthenticatedApp = () => {
         <Route path="/artist-profile" element={<ArtistProfileEdit user={user} />} />
         <Route path="/venue" element={<VenueEdit user={user} />} />
         <Route path="/chat" element={<Chat user={user} />} />
-        <Route path="/marketplace" element={<Marketplace user={user} />} />
+        <Route path="/marketplace" element={<Hire user={user} />} />
+        <Route path="/contratar-show/:artistId" element={<HireProfile user={user} />} />
         <Route path="/my-reviews" element={<MyReviews user={user} />} />
         <Route path="/notifications" element={<Notifications user={user} />} />
         <Route path="/settings" element={<Settings user={user} />} />

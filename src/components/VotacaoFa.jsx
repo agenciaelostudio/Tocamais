@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,23 +21,6 @@ export function VotacaoFa({ artistaId, userId }) {
     fetchVotacao();
   }, [artistaId]);
 
-  // Realtime for vote counts
-  useEffect(() => {
-    if (!votacaoId) return;
-    const channel = supabase
-      .channel(`votacao-fan-${votacaoId}`)
-      .on("postgres_changes", {
-        event: "UPDATE",
-        schema: "public",
-        table: "votacao_opcoes",
-        filter: `votacao_id=eq.${votacaoId}`,
-      }, (payload) => {
-        setOpcoes(prev => prev.map(o => o.id === payload.new.id ? { ...o, votos_count: payload.new.votos_count } : o));
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [votacaoId]);
-
   // Countdown
   useEffect(() => {
     if (!expiresAt) return;
@@ -54,44 +37,37 @@ export function VotacaoFa({ artistaId, userId }) {
 
   const fetchVotacao = async () => {
     try {
-      const { data } = await supabase
-        .from("votacoes")
-        .select("*")
-        .eq("artista_id", artistaId)
-        .eq("status", "ativa")
-        .gt("expires_at", new Date().toISOString())
-        .order("created_at", { ascending: false })
-        .limit(1);
+      const votacoes = await base44.entities.Poll.filter({ 
+        artista_id: artistaId, 
+        status: "ativa" 
+      });
 
-      if (!data || data.length === 0) {
+      const activePoll = votacoes.find(v => new Date(v.expires_at) > new Date());
+
+      if (!activePoll) {
         setVotacaoId(null);
         return;
       }
 
-      const v = data[0];
-      setVotacaoId(v.id);
-      setExpiresAt(v.expires_at);
+      setVotacaoId(activePoll.id);
+      setExpiresAt(activePoll.expires_at);
 
-      const { data: opcoesData } = await supabase
-        .from("votacao_opcoes")
-        .select("*")
-        .eq("votacao_id", v.id);
+      const opcoesData = await base44.entities.PollOption.filter({ 
+        votacao_id: activePoll.id 
+      });
       setOpcoes(opcoesData || []);
 
-      // Check if already voted
-      const { data: votoData } = await supabase
-        .from("votacao_votos")
-        .select("opcao_id")
-        .eq("votacao_id", v.id)
-        .or(userId ? `user_id.eq.${userId}` : `session_id.eq.${sessionId}`)
-        .limit(1);
+      const votos = await base44.entities.Vote.filter({ 
+        votacao_id: activePoll.id 
+      });
       
-      if (votoData && votoData.length > 0) {
-        setVotedOpcaoId(votoData[0].opcao_id);
+      const meuVoto = votos.find(v => userId ? v.user_id === userId : v.session_id === sessionId);
+      
+      if (meuVoto) {
+        setVotedOpcaoId(meuVoto.opcao_id);
       }
     } catch (e) {
-      // Tables might not exist yet
-      console.log("Votacao features not available yet");
+      console.log("Votacao features not available yet", e);
     }
   };
 
@@ -100,20 +76,24 @@ export function VotacaoFa({ artistaId, userId }) {
     setVoting(true);
 
     try {
-      const { data, error } = await supabase.rpc("registrar_voto", {
-        p_votacao_id: votacaoId,
-        p_opcao_id: opcaoId,
-        p_user_id: userId || null,
-        p_session_id: userId ? null : sessionId,
+      await base44.entities.Vote.create({
+        votacao_id: votacaoId,
+        opcao_id: opcaoId,
+        user_id: userId || null,
+        session_id: userId ? null : sessionId,
       });
 
-      if (error || !data?.success) {
-        toast.error(data?.error === "already_voted" ? "Você já votou!" : "Erro ao votar");
-        return;
+      // Manually increment count in mock (in real DB a trigger would do this)
+      const opcao = opcoes.find(o => o.id === opcaoId);
+      if (opcao) {
+        await base44.entities.PollOption.update(opcaoId, {
+          votos_count: (opcao.votos_count || 0) + 1
+        });
       }
 
       setVotedOpcaoId(opcaoId);
       toast.success("Voto registrado! 🗳️");
+      fetchVotacao(); // Refresh counts
     } catch (e) {
       toast.error("Votação não disponível");
     } finally {

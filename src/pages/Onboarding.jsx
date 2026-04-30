@@ -9,6 +9,7 @@ import GlowOrb from '@/components/shared/GlowOrb';
 import Logo from '@/components/shared/Logo';
 import ParticleBackground from '@/components/shared/ParticleBackground';
 import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const roles = [
@@ -209,40 +210,70 @@ export default function Onboarding({ user, onComplete, authError }) {
   );
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden py-10">
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden py-10 md:py-20">
       <ParticleBackground />
-      <GlowOrb color="primary" size={400} className="-top-20 -left-20" />
-      <GlowOrb color="secondary" size={300} className="-bottom-20 -right-20" delay={1.5} />
+      <GlowOrb color="primary" size={600} className="-top-40 -left-40 opacity-40" />
+      <GlowOrb color="secondary" size={500} className="-bottom-40 -right-40 opacity-30" delay={1.5} />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-xl mx-4"
+        className="relative z-10 w-full max-w-2xl mx-4"
       >
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Logo size="lg" />
+        <div className="text-center mb-10 flex flex-col items-center">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="flex justify-center -mb-8 md:-mb-16 lg:-mb-24"
+          >
+            <Logo size="5xl" />
+          </motion.div>
+          
+          <div className="relative z-20 flex flex-col items-center">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-heading font-black tracking-tighter text-foreground mb-3 leading-none"
+            >
+              {isGuest 
+                ? authMode === 'signup' ? 'O PALCO É SEU' : 'BEM-VINDO DE VOLTA'
+                : 'QUASE LÁ'
+              }
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-muted-foreground text-lg md:text-xl font-medium max-w-lg mx-auto mb-8"
+            >
+              {isGuest
+                ? authMode === 'signup'
+                  ? 'Conecte-se com a elite da música ao vivo.'
+                  : 'Acesse sua conta e gerencie suas vibrações.'
+                : 'Personalize sua experiênca na plataforma.'}
+            </motion.p>
+
+            <div className="mb-10">
+              {isGuest && renderGuestAuthModeToggle()}
+            </div>
           </div>
-          {isGuest && renderGuestAuthModeToggle()}
-          <p className="text-muted-foreground mt-4">
-            {isGuest
-              ? authMode === 'signup'
-                ? 'Crie sua conta e comece a usar a plataforma sem depender da Base44.'
-                : 'Entre na sua conta para continuar.'
-              : 'Configure seu perfil para comecar.'}
-          </p>
         </div>
 
-        {authError?.type === 'config_missing' && (
-          <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-            Configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` para usar a autenticacao local.
-          </div>
-        )}
-
         {(!isGuest || authMode === 'signup') && (
-          <div className="flex gap-2 mb-8 px-4">
+          <div className="flex gap-3 mb-12 px-10">
             {[1, 2].map((s) => (
-              <div key={s} className={`h-1 rounded-full flex-1 transition-colors ${s <= step ? 'bg-primary' : 'bg-muted'}`} />
+              <div key={s} className="relative flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                {s <= step && (
+                  <motion.div 
+                    layoutId="progress-bar"
+                    className="absolute inset-0 bg-gradient-to-r from-primary to-secondary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" 
+                  />
+                )}
+              </div>
             ))}
           </div>
         )}
@@ -251,45 +282,50 @@ export default function Onboarding({ user, onComplete, authError }) {
           {isGuest && authMode === 'login' ? (
             <motion.div
               key="login"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-4 bg-card border border-border rounded-xl p-6"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="space-y-6 bg-card/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
             >
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  placeholder="voce@tocamais.app"
-                  value={loginData.email}
-                  onChange={(e) => {
-                    setLoginErrorMessage('');
-                    setLoginData({ ...loginData, email: e.target.value });
-                  }}
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-black uppercase tracking-widest text-primary ml-2">Email</Label>
+                  <Input
+                    type="email"
+                    placeholder="voce@tocamais.app"
+                    value={loginData.email}
+                    onChange={(e) => {
+                      setLoginErrorMessage('');
+                      setLoginData({ ...loginData, email: e.target.value });
+                    }}
+                    className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-lg font-medium px-6"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-black uppercase tracking-widest text-primary ml-2">Senha</Label>
+                  <Input
+                    type="password"
+                    placeholder="Sua senha secreta"
+                    value={loginData.password}
+                    onChange={(e) => {
+                      setLoginErrorMessage('');
+                      setLoginData({ ...loginData, password: e.target.value });
+                    }}
+                    className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-lg font-medium px-6"
+                  />
+                </div>
               </div>
-              <div>
-                <Label>Senha</Label>
-                <Input
-                  type="password"
-                  placeholder="Sua senha"
-                  value={loginData.password}
-                  onChange={(e) => {
-                    setLoginErrorMessage('');
-                    setLoginData({ ...loginData, password: e.target.value });
-                  }}
-                />
-              </div>
-              <div className="flex items-center gap-3">
+              
+              <div className="flex flex-col gap-4 pt-4">
                 <AnimatedButton
                   onClick={handleGuestLogin}
                   disabled={loading}
-                  className="bg-gradient-to-r from-primary to-secondary text-white border-0"
+                  className="h-16 rounded-2xl bg-foreground text-background font-black text-lg tracking-tight hover:scale-[1.02] transition-all shadow-2xl"
                 >
-                  {loading ? 'Entrando...' : 'Entrar'}
+                  {loading ? 'Sincronizando...' : 'ENTRAR NO PALCO'}
                 </AnimatedButton>
                 {loginErrorMessage && (
-                  <p className="text-sm text-destructive">{loginErrorMessage}</p>
+                  <p className="text-sm text-destructive text-center font-bold animate-shake">{loginErrorMessage}</p>
                 )}
               </div>
             </motion.div>
@@ -301,32 +337,39 @@ export default function Onboarding({ user, onComplete, authError }) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
+                  className="space-y-4"
                 >
-                  <h2 className="text-xl font-heading font-bold mb-6 text-center">Qual e o seu perfil?</h2>
-                  <div className="space-y-3">
+                  <h2 className="text-xs font-black uppercase tracking-[0.4em] text-center text-primary mb-8">Selecione sua Jornada</h2>
+                  <div className="grid grid-cols-1 gap-4">
                     {roles.map((role) => (
                       <motion.button
                         key={role.id}
-                        whileHover={{ scale: 1.02 }}
+                        whileHover={{ scale: 1.02, x: 4 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           setSelectedRole(role.id);
                           setStep(2);
                         }}
-                        className={`w-full p-4 rounded-xl border transition-all duration-200 flex items-center gap-4 text-left ${
+                        className={`group relative w-full p-6 rounded-[2rem] border transition-all duration-500 flex items-center gap-6 text-left overflow-hidden ${
                           selectedRole === role.id
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border bg-card hover:border-primary/50'
+                            ? 'border-primary/50 bg-primary/10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.1)]'
+                            : 'border-white/5 bg-card/40 backdrop-blur-xl hover:border-white/20'
                         }`}
                       >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${role.gradient} flex items-center justify-center shrink-0`}>
-                          <role.icon className="w-6 h-6 text-white" />
+                        <div className={`absolute inset-0 bg-gradient-to-r ${role.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity`} />
+                        
+                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${role.gradient} flex items-center justify-center shrink-0 shadow-xl relative z-10 group-hover:scale-110 transition-transform duration-500`}>
+                          <role.icon className="w-8 h-8 text-white" />
                         </div>
-                        <div>
-                          <p className="font-semibold">{role.title}</p>
-                          <p className="text-sm text-muted-foreground">{role.desc}</p>
+                        
+                        <div className="relative z-10">
+                          <p className="text-xl font-heading font-black tracking-tight text-foreground">{role.title}</p>
+                          <p className="text-sm text-muted-foreground font-medium">{role.desc}</p>
                         </div>
-                        <ArrowRight className="w-5 h-5 text-muted-foreground ml-auto" />
+                        
+                        <div className="ml-auto relative z-10 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-4 transition-all duration-500">
+                          <ArrowRight className="w-6 h-6 text-primary" />
+                        </div>
                       </motion.button>
                     ))}
                   </div>
@@ -339,89 +382,101 @@ export default function Onboarding({ user, onComplete, authError }) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6 bg-card/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
                 >
-                  <h2 className="text-xl font-heading font-bold mb-6 text-center">
-                    {isGuest ? 'Crie sua conta' : 'Informacoes basicas'}
+                  <h2 className="text-xs font-black uppercase tracking-[0.4em] text-center text-primary mb-4">
+                    {isGuest ? 'Últimos Detalhes' : 'Perfil Artístico'}
                   </h2>
-                  <div className="space-y-4 bg-card border border-border rounded-xl p-6">
+                  
+                  <div className="space-y-6">
                     {isGuest && (
-                      <>
-                        <div>
-                          <Label>Nome</Label>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Nome Completo</Label>
                           <Input
-                            placeholder="Seu nome"
+                            placeholder="Seu nome artístico ou real"
                             value={signupData.full_name}
                             onChange={(e) => setSignupData({ ...signupData, full_name: e.target.value })}
+                            className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                           />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <Label>Email</Label>
+                          <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Email</Label>
                             <Input
                               type="email"
                               placeholder="voce@tocamais.app"
                               value={signupData.email}
                               onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                              className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                             />
                           </div>
-                          <div>
-                            <Label>Senha</Label>
+                          <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Senha</Label>
                             <Input
                               type="password"
-                              placeholder="Crie uma senha"
+                              placeholder="Crie sua senha"
                               value={signupData.password}
                               onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                              className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                             />
                           </div>
                         </div>
-                      </>
+                      </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Cidade</Label>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Cidade</Label>
                         <Input
-                          placeholder="Sao Paulo"
+                          placeholder="Ex: São Paulo"
                           value={formData.city}
                           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                         />
                       </div>
-                      <div>
-                        <Label>Estado</Label>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Estado</Label>
                         <Input
                           placeholder="SP"
                           value={formData.state}
                           onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                         />
                       </div>
                     </div>
-                    <div>
-                      <Label>Telefone</Label>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">WhatsApp</Label>
                       <Input
                         placeholder="(11) 99999-9999"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                       />
                     </div>
-                    <div>
-                      <Label>Sobre voce</Label>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Bio / Descrição</Label>
                       <Textarea
-                        placeholder="Conte um pouco sobre voce..."
+                        placeholder="Conte brevemente sua história..."
                         value={formData.bio}
                         onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                         rows={3}
+                        className="rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium p-6 resize-none"
                       />
                     </div>
-                    <div className="flex gap-3 pt-2">
-                      <AnimatedButton variant="outline" onClick={() => setStep(1)} className="flex-1">
+                    
+                    <div className="flex gap-4 pt-6">
+                      <Button variant="ghost" onClick={() => setStep(1)} className="h-16 flex-1 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 font-bold">
                         Voltar
-                      </AnimatedButton>
+                      </Button>
                       <AnimatedButton
                         onClick={isGuest ? handleGuestSignup : handleAuthenticatedFinish}
                         disabled={loading}
-                        className="flex-1 bg-gradient-to-r from-primary to-secondary text-white border-0"
+                        className="h-16 flex-[2] bg-gradient-to-r from-primary to-secondary text-white border-0 font-black text-lg tracking-tight shadow-xl shadow-primary/20"
                       >
-                        {loading ? 'Salvando...' : isGuest ? 'Criar conta' : 'Comecar'}
+                        {loading ? 'Sincronizando...' : isGuest ? 'CRIAR CONTA' : 'FINALIZAR'}
                       </AnimatedButton>
                     </div>
                   </div>
@@ -433,4 +488,5 @@ export default function Onboarding({ user, onComplete, authError }) {
       </motion.div>
     </div>
   );
+
 }

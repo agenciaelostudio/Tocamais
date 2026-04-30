@@ -11,17 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [authChecked, setAuthChecked] = useState(false);
 
   const refreshUser = async () => {
-    if (!isSupabaseConfigured) {
-      setUser(null);
-      setAuthError({
-        type: 'config_missing',
-        message: 'Supabase is not configured.',
-      });
-      setIsLoadingAuth(false);
-      setAuthChecked(true);
-      return null;
-    }
-
     setIsLoadingAuth(true);
     setAuthError(null);
 
@@ -47,18 +36,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
+    refreshUser();
+
     if (!isSupabaseConfigured) {
-      setUser(null);
-      setAuthError({
-        type: 'config_missing',
-        message: 'Supabase is not configured.',
-      });
-      setIsLoadingAuth(false);
-      setAuthChecked(true);
       return undefined;
     }
-
-    refreshUser();
 
     const supabase = getSupabase();
     const {

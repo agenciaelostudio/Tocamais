@@ -89,6 +89,9 @@
   body {
     @apply bg-background text-foreground font-body;
   }
+  .font-display {
+    font-family: var(--font-heading);
+  }
 }
 
 /* Custom scrollbar */

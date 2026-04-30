@@ -10,31 +10,52 @@ const ENTITY_TABLES = {
   Review: 'reviews',
   Tip: 'tips',
   Venue: 'venues',
+  RepertoireSong: 'musicas_repertorio',
+  Order: 'pedidos',
+  Poll: 'votacoes',
+  PollOption: 'votacao_opcoes',
+  Vote: 'votacao_votos',
 };
+
+// --- LOCAL STORAGE MOCK DB ---
+const getLocalDB = () => {
+  if (typeof window === 'undefined') return {};
+  const db = localStorage.getItem('tocamais_db');
+  return db ? JSON.parse(db) : { users: [] };
+};
+
+const saveLocalDB = (db) => {
+  if (typeof window !== 'undefined') localStorage.setItem('tocamais_db', JSON.stringify(db));
+};
+
+const getLocalUser = () => {
+  if (typeof window === 'undefined') return null;
+  const user = localStorage.getItem('tocamais_user');
+  return user ? JSON.parse(user) : null;
+};
+
+const setLocalUser = (user) => {
+  if (typeof window !== 'undefined') {
+    if (user) localStorage.setItem('tocamais_user', JSON.stringify(user));
+    else localStorage.removeItem('tocamais_user');
+  }
+};
+// -----------------------------
 
 function ensureConfigured() {
   if (!isSupabaseConfigured) {
-    throw new Error('Supabase is not configured.');
+    console.warn('⚠️ Base44/Supabase is not configured. Using LocalStorage Mock.');
   }
 }
 
 function mapSortField(field) {
-  if (field === 'created_date') {
-    return 'created_at';
-  }
-
-  if (field === 'updated_date') {
-    return 'updated_at';
-  }
-
+  if (field === 'created_date') return 'created_at';
+  if (field === 'updated_date') return 'updated_at';
   return field;
 }
 
 function normalizeRecord(record) {
-  if (!record) {
-    return record;
-  }
-
+  if (!record) return record;
   return {
     ...record,
     created_date: record.created_at ?? record.created_date ?? null,
@@ -48,11 +69,7 @@ function withNormalizedRecords(records) {
 
 async function runQuery(queryPromise) {
   const { data, error } = await queryPromise;
-
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 }
 
@@ -61,20 +78,36 @@ function createEntityApi(entityName) {
 
   return {
     async filter(filters = {}, sort, limit) {
-      ensureConfigured();
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        let records = db[table] || [];
+        
+        Object.entries(filters || {}).forEach(([key, value]) => {
+          if (value === undefined || value === null || value === '') return;
+          if (Array.isArray(value)) records = records.filter(r => value.includes(r[key]));
+          else records = records.filter(r => r[key] === value);
+        });
+
+        if (sort) {
+          const descending = sort.startsWith('-');
+          const column = mapSortField(descending ? sort.slice(1) : sort);
+          records.sort((a, b) => {
+            if (a[column] < b[column]) return descending ? 1 : -1;
+            if (a[column] > b[column]) return descending ? -1 : 1;
+            return 0;
+          });
+        }
+
+        if (typeof limit === 'number') records = records.slice(0, limit);
+        return withNormalizedRecords(records);
+      }
+
       const supabase = getSupabase();
       let query = supabase.from(table).select('*');
 
       Object.entries(filters || {}).forEach(([key, value]) => {
-        if (value === undefined || value === null || value === '') {
-          return;
-        }
-
-        if (Array.isArray(value)) {
-          query = query.in(key, value);
-          return;
-        }
-
+        if (value === undefined || value === null || value === '') return;
+        if (Array.isArray(value)) { query = query.in(key, value); return; }
         query = query.eq(key, value);
       });
 
@@ -84,38 +117,60 @@ function createEntityApi(entityName) {
         query = query.order(column, { ascending: !descending });
       }
 
-      if (typeof limit === 'number') {
-        query = query.limit(limit);
-      }
+      if (typeof limit === 'number') query = query.limit(limit);
 
       const data = await runQuery(query);
       return withNormalizedRecords(data);
     },
 
     async create(payload) {
-      ensureConfigured();
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        const record = { 
+          ...payload, 
+          id: Math.random().toString(36).substr(2, 9), 
+          created_at: new Date().toISOString() 
+        };
+        db[table] = [...(db[table] || []), record];
+        saveLocalDB(db);
+        return normalizeRecord(record);
+      }
+
       const supabase = getSupabase();
-      const data = await runQuery(
-        supabase.from(table).insert(payload).select('*').single()
-      );
+      const data = await runQuery(supabase.from(table).insert(payload).select('*').single());
       return normalizeRecord(data);
     },
 
     async update(id, payload) {
-      ensureConfigured();
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        let updatedRecord = null;
+        db[table] = (db[table] || []).map(r => {
+          if (r.id === id) {
+            updatedRecord = { ...r, ...payload, updated_at: new Date().toISOString() };
+            return updatedRecord;
+          }
+          return r;
+        });
+        saveLocalDB(db);
+        return normalizeRecord(updatedRecord);
+      }
+
       const supabase = getSupabase();
-      const data = await runQuery(
-        supabase.from(table).update(payload).eq('id', id).select('*').single()
-      );
+      const data = await runQuery(supabase.from(table).update(payload).eq('id', id).select('*').single());
       return normalizeRecord(data);
     },
 
     async delete(id) {
-      ensureConfigured();
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        db[table] = (db[table] || []).filter(r => r.id !== id);
+        saveLocalDB(db);
+        return { success: true };
+      }
+
       const supabase = getSupabase();
-      await runQuery(
-        supabase.from(table).delete().eq('id', id)
-      );
+      await runQuery(supabase.from(table).delete().eq('id', id));
       return { success: true };
     },
   };
@@ -123,22 +178,40 @@ function createEntityApi(entityName) {
 
 async function fetchCurrentProfile() {
   if (!isSupabaseConfigured) {
-    return null;
+    const user = getLocalUser();
+    if (!user) return null;
+    
+    const db = getLocalDB();
+    let profile = db.users?.find(u => u.email === user.email);
+    
+    if (!profile) {
+      profile = {
+        ...user,
+        full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario',
+        role: user.user_metadata?.role || 'fan',
+        onboarding_complete: Boolean(user.user_metadata?.onboarding_complete),
+      };
+      db.users = [...(db.users || []), profile];
+      saveLocalDB(db);
+    } else {
+      // Ensure top-level properties are always synced from user_metadata for the mock
+      profile = {
+        ...profile,
+        full_name: profile.user_metadata?.full_name || profile.full_name || profile.email?.split('@')[0] || 'Usuario',
+        role: profile.user_metadata?.role || profile.role || 'fan',
+        onboarding_complete: Boolean(profile.user_metadata?.onboarding_complete || profile.onboarding_complete),
+      };
+    }
+    
+    await ensureRoleRecordsMock(profile);
+    return normalizeRecord(profile);
   }
 
   const supabase = getSupabase();
-  const {
-    data: { user: authUser },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
-  if (authError) {
-    throw authError;
-  }
-
-  if (!authUser) {
-    return null;
-  }
+  if (authError) throw authError;
+  if (!authUser) return null;
 
   const { data: profile, error: profileError } = await supabase
     .from('users')
@@ -146,9 +219,7 @@ async function fetchCurrentProfile() {
     .eq('id', authUser.id)
     .maybeSingle();
 
-  if (profileError) {
-    throw profileError;
-  }
+  if (profileError) throw profileError;
 
   const baseProfile = profile ?? {
     id: authUser.id,
@@ -165,9 +236,7 @@ async function fetchCurrentProfile() {
 
   if (!profile) {
     const { error: insertError } = await supabase.from('users').insert(baseProfile);
-    if (insertError) {
-      throw insertError;
-    }
+    if (insertError) throw insertError;
   }
 
   const mergedProfile = {
@@ -177,24 +246,43 @@ async function fetchCurrentProfile() {
   };
 
   await ensureRoleRecords(mergedProfile);
-
   return normalizeRecord(mergedProfile);
+}
+
+async function ensureRoleRecordsMock(user) {
+  const db = getLocalDB();
+  if (user.role === 'artist') {
+    const exists = db.artist_profiles?.find(p => p.user_email === user.email);
+    if (!exists) {
+      db.artist_profiles = [...(db.artist_profiles || []), {
+        id: Math.random().toString(36).substr(2, 9),
+        user_id: user.id,
+        user_email: user.email,
+        stage_name: user.full_name || user.email,
+        bio: user.bio || '',
+        city: user.city || '',
+        state: user.state || '',
+        genres: [],
+        performance_types: [],
+        base_price: 0,
+        avg_rating: 0,
+        total_reviews: 0,
+        total_tips: 0,
+        available_days: [],
+        social_links: {},
+        is_active: true,
+      }];
+      saveLocalDB(db);
+    }
+  }
 }
 
 async function ensureRoleRecords(user) {
   const supabase = getSupabase();
 
   if (user.role === 'artist') {
-    const { data, error } = await supabase
-      .from('artist_profiles')
-      .select('id')
-      .eq('user_email', user.email)
-      .limit(1);
-
-    if (error) {
-      throw error;
-    }
-
+    const { data, error } = await supabase.from('artist_profiles').select('id').eq('user_email', user.email).limit(1);
+    if (error) throw error;
     if (!data?.length) {
       const { error: createError } = await supabase.from('artist_profiles').insert({
         user_id: user.id,
@@ -213,24 +301,13 @@ async function ensureRoleRecords(user) {
         social_links: {},
         is_active: true,
       });
-
-      if (createError) {
-        throw createError;
-      }
+      if (createError) throw createError;
     }
   }
 
   if (user.role === 'bar_owner') {
-    const { data, error } = await supabase
-      .from('venues')
-      .select('id')
-      .eq('owner_email', user.email)
-      .limit(1);
-
-    if (error) {
-      throw error;
-    }
-
+    const { data, error } = await supabase.from('venues').select('id').eq('owner_email', user.email).limit(1);
+    if (error) throw error;
     if (!data?.length) {
       const { error: createError } = await supabase.from('venues').insert({
         owner_email: user.email,
@@ -243,16 +320,17 @@ async function ensureRoleRecords(user) {
         capacity: 0,
         phone: user.phone || '',
       });
-
-      if (createError) {
-        throw createError;
-      }
+      if (createError) throw createError;
     }
   }
 }
 
 async function uploadFile({ file }) {
-  ensureConfigured();
+  if (!isSupabaseConfigured) {
+    // Return a dummy image or a blob URL for local testing
+    return { file_url: URL.createObjectURL(file) };
+  }
+
   const supabase = getSupabase();
   const extension = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
   const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
@@ -263,9 +341,7 @@ async function uploadFile({ file }) {
     upsert: true,
   });
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   const { data } = supabase.storage.from('media').getPublicUrl(path);
   return { file_url: data.publicUrl };
@@ -278,18 +354,30 @@ export const base44 = {
     },
 
     async updateMe(payload) {
-      ensureConfigured();
-      const supabase = getSupabase();
       const currentUser = await fetchCurrentProfile();
+      if (!currentUser) throw new Error('User is not authenticated.');
 
-      if (!currentUser) {
-        throw new Error('User is not authenticated.');
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        db.users = (db.users || []).map(u => {
+          if (u.id === currentUser.id) {
+            return { ...u, ...payload, full_name: payload.full_name ?? u.full_name };
+          }
+          return u;
+        });
+        saveLocalDB(db);
+        
+        // Also update local user metadata cache
+        const localUser = getLocalUser();
+        if (localUser) {
+           localUser.user_metadata = { ...localUser.user_metadata, ...payload };
+           setLocalUser(localUser);
+        }
+        return fetchCurrentProfile();
       }
 
-      const updates = {
-        ...payload,
-      };
-
+      const supabase = getSupabase();
+      const updates = { ...payload };
       const fullName = payload.full_name ?? currentUser.full_name;
       const metadata = {
         full_name: fullName,
@@ -302,72 +390,66 @@ export const base44 = {
       };
 
       if (payload.full_name) {
-        const { error: authUpdateError } = await supabase.auth.updateUser({
-          data: { full_name: payload.full_name },
-        });
-
-        if (authUpdateError) {
-          throw authUpdateError;
-        }
+        const { error: authUpdateError } = await supabase.auth.updateUser({ data: { full_name: payload.full_name } });
+        if (authUpdateError) throw authUpdateError;
       }
 
       const { error: profileError } = await supabase
         .from('users')
-        .update({
-          ...updates,
-          email: currentUser.email,
-          full_name: fullName,
-        })
+        .update({ ...updates, email: currentUser.email, full_name: fullName })
         .eq('id', currentUser.id);
 
-      if (profileError) {
-        throw profileError;
-      }
+      if (profileError) throw profileError;
 
-      const { error: metadataError } = await supabase.auth.updateUser({
-        data: metadata,
-      });
-
-      if (metadataError) {
-        throw metadataError;
-      }
+      const { error: metadataError } = await supabase.auth.updateUser({ data: metadata });
+      if (metadataError) throw metadataError;
 
       return fetchCurrentProfile();
     },
 
     async signInWithPassword({ email, password }) {
-      ensureConfigured();
-      const supabase = getSupabase();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        const user = db.users?.find(u => u.email === email && u.password === password);
+        if (!user) throw new Error('Invalid credentials (Local Mock). Did you register?');
+        setLocalUser(user);
+        return { session: true, user };
       }
 
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       return data;
     },
 
     async signUp({ email, password, options }) {
-      ensureConfigured();
-      const supabase = getSupabase();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options,
-      });
-
-      if (error) {
-        throw error;
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        if (db.users?.find(u => u.email === email)) throw new Error('User already exists (Local Mock)');
+        
+        const newUser = {
+          id: Math.random().toString(36).substr(2, 9),
+          email,
+          password, // Storing plain text password ONLY for local dev mock!
+          user_metadata: options?.data || {}
+        };
+        
+        db.users = [...(db.users || []), newUser];
+        saveLocalDB(db);
+        setLocalUser(newUser);
+        return { session: true, user: newUser };
       }
 
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.signUp({ email, password, options });
+      if (error) throw error;
       return data;
     },
 
     async logout(redirectTo = '/') {
-      if (isSupabaseConfigured) {
+      if (!isSupabaseConfigured) {
+        setLocalUser(null);
+      } else {
         const supabase = getSupabase();
         await supabase.auth.signOut();
       }
@@ -378,9 +460,7 @@ export const base44 = {
     },
 
     redirectToLogin() {
-      if (typeof window !== 'undefined') {
-        window.location.assign('/');
-      }
+      if (typeof window !== 'undefined') window.location.assign('/');
     },
   },
 
@@ -389,8 +469,6 @@ export const base44 = {
   ),
 
   integrations: {
-    Core: {
-      UploadFile: uploadFile,
-    },
+    Core: { UploadFile: uploadFile },
   },
 };

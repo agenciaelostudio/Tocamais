@@ -1,55 +1,62 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { base44 } from "@/api/base44Client";
 
 export function useFavorite(targetId, targetType) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userEmail, setUserEmail] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email || null);
+    base44.auth.me().then(u => {
+      setUser(u);
     });
   }, []);
 
   useEffect(() => {
-    if (!userEmail || !targetId) return;
+    if (!user?.email || !targetId) return;
     const check = async () => {
-      const { data } = await supabase
-        .from("favorites")
-        .select("id")
-        .eq("fan_email", userEmail)
-        .eq("artist_profile_id", targetId)
-        .maybeSingle();
-      setIsFavorited(!!data);
+      try {
+        const favorites = await base44.entities.Favorite.filter({ 
+          fan_email: user.email, 
+          artist_profile_id: targetId 
+        });
+        setIsFavorited(favorites.length > 0);
+      } catch (e) {
+        console.error("Erro ao checar favorito:", e);
+      }
     };
     check();
-  }, [userEmail, targetId]);
+  }, [user?.email, targetId]);
 
   const toggle = async () => {
-    if (!userEmail || !targetId || loading) return false;
+    if (!user?.email || !targetId || loading) return false;
     setLoading(true);
     try {
       if (isFavorited) {
-        await supabase
-          .from("favorites")
-          .delete()
-          .eq("fan_email", userEmail)
-          .eq("artist_profile_id", targetId);
+        // Find the record to delete
+        const favorites = await base44.entities.Favorite.filter({ 
+          fan_email: user.email, 
+          artist_profile_id: targetId 
+        });
+        if (favorites[0]) {
+          await base44.entities.Favorite.delete(favorites[0].id);
+        }
         setIsFavorited(false);
       } else {
-        await supabase
-          .from("favorites")
-          .insert({ fan_email: userEmail, artist_profile_id: targetId });
+        await base44.entities.Favorite.create({ 
+          fan_email: user.email, 
+          artist_profile_id: targetId 
+        });
         setIsFavorited(true);
       }
       return true;
-    } catch {
+    } catch (e) {
+      console.error("Erro ao toggle favorito:", e);
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  return { isFavorited, toggle, loading, isLoggedIn: !!userEmail };
+  return { isFavorited, toggle, loading, isLoggedIn: !!user };
 }
