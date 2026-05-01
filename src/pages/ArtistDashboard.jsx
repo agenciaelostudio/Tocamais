@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock } from 'lucide-react';
+import { DollarSign, Send, Calendar, Star, Music, LayoutDashboard, Wallet, ChevronRight, Clock } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';

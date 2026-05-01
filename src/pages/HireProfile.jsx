@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {
-  ArrowLeft, Star, MapPin, Music, User, Users, LayoutGrid, Mic2,
-  ChevronRight, CheckCircle2, Calendar, DollarSign, Play, Sparkles, Heart
+  ArrowLeft, Star, MapPin, Music, User, Users, LayoutGrid, Mic,
+  ChevronRight, CheckCircle2, Play
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
 import VerticalVideoPlayer from '@/components/VerticalVideoPlayer';
 
 const FORMAT_CONFIG = {
   'Solo':         { icon: User,      color: 'primary',   label: 'Solo',         mult: 1.0 },
-  'Voz e Violão': { icon: Mic2,      color: 'secondary', label: 'Voz e Violão', mult: 1.0 },
+  'Voz e Violão': { icon: Mic,      color: 'secondary', label: 'Voz e Violão', mult: 1.0 },
   'Dupla':        { icon: Users,     color: 'emerald',   label: 'Dupla',        mult: 1.4 },
   'Trio':         { icon: Users,     color: 'yellow',    label: 'Trio',         mult: 1.8 },
   'Banda':        { icon: LayoutGrid,color: 'pink',      label: 'Banda',        mult: 2.5 },
@@ -31,7 +30,7 @@ const COLOR_CLASSES = {
 };
 
 function FormatCard({ format, config, formatData, basePrice, onSelect, isSelected }) {
-  const Icon = config?.icon || Mic2;
+  const Icon = config?.icon || Mic;
   const colors = COLOR_CLASSES[config?.color || 'primary'];
   const price = formatData?.price || Math.round((basePrice || 800) * (config?.mult || 1));
   const description = formatData?.description || '';
@@ -282,7 +281,7 @@ export default function HireProfile({ user }) {
 
           <div className="space-y-4">
             {formats.map((fmt) => {
-              const config = FORMAT_CONFIG[fmt] || { icon: Mic2, color: 'primary', mult: 1.0 };
+              const config = FORMAT_CONFIG[fmt] || { icon: Mic, color: 'primary', mult: 1.0 };
               const formatData = showFormatsData[fmt] || {};
               return (
                 <FormatCard

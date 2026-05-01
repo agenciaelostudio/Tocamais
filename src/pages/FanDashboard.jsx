@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Search, Heart, Star, Calendar, Music, ArrowRight, Sparkles, Wallet, Award, TrendingUp } from 'lucide-react';
+import { Search, Heart, Star, Music, ArrowRight, Sparkles, Wallet, Award, TrendingUp } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import ArtistCard from '@/components/cards/ArtistCard';
 import { Link } from 'react-router-dom';

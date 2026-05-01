@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { getSupabase, isSupabaseConfigured } from '@/api/supabaseClient';
-import { MessageSquare, Send, ArrowLeft, Zap, Music, Calendar, DollarSign } from 'lucide-react';
+import { MessageSquare, Send, ArrowLeft, Zap, Calendar, DollarSign } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import StatusBadge from '@/components/shared/StatusBadge';

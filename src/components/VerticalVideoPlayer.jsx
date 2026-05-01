@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Play, ExternalLink, Instagram, Youtube } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 function extractVideoInfo(url) {
   if (!url) return null;

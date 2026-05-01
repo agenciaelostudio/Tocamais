@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Music, DollarSign, ChevronRight } from 'lucide-react';
+import { MapPin, Music, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import StarRating from '@/components/shared/StarRating';
 import { Link } from 'react-router-dom';

@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { SEOHead } from "@/components/SEOHead";
-import { GlassCard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +18,6 @@ import {
   MapPin, 
   Users, 
   Volume2, 
-  DollarSign, 
   Clock, 
   Search, 
   CheckCircle2,
@@ -29,7 +27,6 @@ import {
   Star
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSessionId } from "@/hooks/useSessionId";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";

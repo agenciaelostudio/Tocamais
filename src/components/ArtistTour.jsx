@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Mic2, Users, User, LayoutGrid, Sparkles, Star, Zap, Music, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Mic, Users, User, LayoutGrid, Sparkles, Star, Zap, Music, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -81,7 +81,7 @@ const STEPS = [
   },
 ];
 
-const FORMAT_ICONS = { Solo: User, Dupla: Users, Trio: Users, Banda: LayoutGrid, DJ: Music, 'Voz e Violão': Mic2 };
+const FORMAT_ICONS = { Solo: User, Dupla: Users, Trio: Users, Banda: LayoutGrid, DJ: Music, 'Voz e Violão': Mic };
 
 export default function ArtistTour({ profileId, onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -200,7 +200,7 @@ export default function ArtistTour({ profileId, onComplete }) {
             {step.formats && (
               <div className="flex flex-wrap justify-center gap-3">
                 {step.formats.map((fmt) => {
-                  const Icon = FORMAT_ICONS[fmt] || Mic2;
+                  const Icon = FORMAT_ICONS[fmt] || Mic;
                   return (
                     <div key={fmt} className="flex flex-col items-center gap-2 px-4 py-3 rounded-2xl bg-white/5 border border-white/5">
                       <Icon className="w-5 h-5 text-emerald-400" />

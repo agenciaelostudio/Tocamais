@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Music, Save, Upload, MapPin, DollarSign, Instagram, Youtube, Play, Globe, ChevronDown, Link2, Info, Video } from 'lucide-react';
+import { Music, Save, Upload, MapPin, DollarSign, Instagram, Youtube, Play, Globe, ChevronDown, Link2, Video } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';

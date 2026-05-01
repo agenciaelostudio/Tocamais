@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { MusicCombobox } from "@/components/MusicCombobox";
-import { Copy, Check, QrCode, Clock, Loader2, ArrowLeft, ArrowRight, CheckCircle2, Music, Sparkles, Heart } from "lucide-react";
+import { Copy, Check, Clock, Loader2, ArrowRight, Music, Sparkles, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { generatePixPayload, generatePixQRCodeDataUrl } from "@/lib/pix-qr-generator";

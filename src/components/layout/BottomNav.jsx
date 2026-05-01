@@ -5,15 +5,10 @@ import {
   Search, 
   Send, 
   Calendar, 
-  MessageSquare, 
-  Store, 
-  Music, 
   DollarSign, 
-  ShoppingBag, 
   Heart, 
   Star,
   Bell,
-  Settings,
   Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";

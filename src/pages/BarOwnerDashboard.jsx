@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Calendar, Send, Star, Music, TrendingUp, Users, DollarSign, ChevronRight, MapPin } from 'lucide-react';
+import { Calendar, Send, Star, Music, TrendingUp, Users, DollarSign, ChevronRight } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';

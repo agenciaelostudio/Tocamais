@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
-import { Send, Check, X, Calendar, DollarSign, Music, ArrowRight, Filter, Search, ChevronRight } from 'lucide-react';
+import { Send, Check, X, Calendar, DollarSign, Music, ArrowRight, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
