@@ -9,7 +9,8 @@ import {
   Heart, 
   Star,
   Bell,
-  Menu
+  Menu,
+  Mic
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const navByRole = {
     { label: 'Propostas', icon: Send, path: '/proposals' },
     { label: 'Agenda', icon: Calendar, path: '/events' },
     { label: 'Gorjetas', icon: DollarSign, path: '/tips' },
+    { label: 'Perfil', icon: Mic, path: '/artist-profile' },
   ],
   fan: [
     { label: 'Explorar', icon: Search, path: '/explore' },
