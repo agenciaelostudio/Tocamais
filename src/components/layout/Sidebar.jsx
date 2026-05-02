@@ -6,7 +6,6 @@ import {
   Music,
   Calendar,
   MessageSquare,
-  Bell,
   Heart,
   Star,
   DollarSign,
@@ -15,9 +14,7 @@ import {
   Store,
   Settings,
   LogOut,
-  Menu,
   X,
-  ShoppingBag,
   Zap,
   Mic2,
 } from 'lucide-react';
@@ -41,7 +38,7 @@ const navByRole = {
     { label: 'Gorjetas', icon: DollarSign, path: '/tips' },
     { label: 'Contrate', icon: Music, path: '/marketplace' },
     { label: 'Chat', icon: MessageSquare, path: '/chat' },
-    { label: 'Meu Perfil', icon: Mic2, path: '/artist-profile' },
+    { label: 'Meu Perfil', icon: Mic, path: '/artist-profile' },
   ],
   fan: [
     { label: 'Explorar', icon: Search, path: '/explore' },

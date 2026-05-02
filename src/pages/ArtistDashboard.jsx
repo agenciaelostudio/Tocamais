@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/integrations/supabase/client';
@@ -255,14 +255,14 @@ export default function ArtistDashboard({ user }) {
                   </Link>
                 </div>
 
-                {tips.length === 0 ? (
+                {gorjetas.length === 0 ? (
                   <div className="text-center py-16 text-muted-foreground bg-background/20 rounded-3xl border border-dashed border-white/5">
                     <DollarSign className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4 opacity-40" />
                     <p className="font-medium">Nenhuma gorjeta recebida ainda</p>
                   </div>
                 ) : (
                   <div className="space-y-4 relative z-10">
-                    {tips.slice(0, 5).map((t, idx) => (
+                    {gorjetas.slice(0, 5).map((t, idx) => (
                       <motion.div 
                         key={t.id} 
                         initial={{ opacity: 0, x: 10 }} 
@@ -439,7 +439,7 @@ export default function ArtistDashboard({ user }) {
                   <p className="text-3xl font-black text-emerald-500 font-heading tracking-tighter">R$ {totalTips.toLocaleString('pt-BR')}</p>
                 </div>
               </div>
-              <TipsSummary tips={tips} />
+              <TipsSummary tips={gorjetas} />
             </div>
           </TabsContent>
         </Tabs>

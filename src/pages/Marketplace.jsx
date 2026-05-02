@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Music, Star, Filter, ChevronRight, Users, User, Mic2, LayoutGrid, MapPin } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 
 const FORMAT_ICONS = {
   'Solo': User,
-  'Voz e Violão': Mic2,
+  'Voz e Violão': Mic,
   'Dupla': Users,
   'Trio': Users,
   'Banda': LayoutGrid,
@@ -113,7 +111,7 @@ function ArtistHireCard({ artist, onClick }) {
           </div>
           <div className="grid grid-cols-2 gap-2">
             {formats.slice(0, 4).map((fmt) => {
-              const Icon = FORMAT_ICONS[fmt] || Mic2;
+              const Icon = FORMAT_ICONS[fmt] || Mic;
               return (
                 <div key={fmt} className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 group/fmt hover:bg-primary/10 hover:border-primary/20 transition-all duration-300">
                   <div className="w-8 h-8 rounded-xl bg-background/40 flex items-center justify-center shadow-inner group-hover/fmt:scale-110 transition-transform">

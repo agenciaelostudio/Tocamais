@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Settings as SettingsIcon, Save, User } from 'lucide-react';
+import { Save, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AnimatedButton from '@/components/shared/AnimatedButton';

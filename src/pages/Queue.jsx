@@ -1,14 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
-import { useSearchParams, useParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/api/supabaseClient";
 import { SEOHead } from "@/components/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, ArrowLeft, Clock, Play, Check, Send, User } from "lucide-react";
-import { toast } from "sonner";
+import { Music, ArrowLeft, Clock, Check, Send, User } from "lucide-react";
 
 const QueuePage = () => {
   const [searchParams] = useSearchParams();

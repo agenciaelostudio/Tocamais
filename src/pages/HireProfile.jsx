@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -10,12 +10,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
 import VerticalVideoPlayer from '@/components/VerticalVideoPlayer';
 
 const FORMAT_CONFIG = {
   'Solo':         { icon: User,      color: 'primary',   label: 'Solo',         mult: 1.0 },
-  'Voz e Violão': { icon: Mic2,      color: 'secondary', label: 'Voz e Violão', mult: 1.0 },
+  'Voz e Violão': { icon: Mic,      color: 'secondary', label: 'Voz e Violão', mult: 1.0 },
   'Dupla':        { icon: Users,     color: 'emerald',   label: 'Dupla',        mult: 1.4 },
   'Trio':         { icon: Users,     color: 'yellow',    label: 'Trio',         mult: 1.8 },
   'Banda':        { icon: LayoutGrid,color: 'pink',      label: 'Banda',        mult: 2.5 },
