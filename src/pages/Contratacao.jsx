@@ -224,7 +224,7 @@ export default function Contratacao({ user }) {
 
       <main className="container mx-auto max-w-2xl pb-40 relative z-10">
         {/* Artist Quick Info */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 space-y-4">
           <div className="relative group rounded-[2.5rem] bg-card/40 border border-white/5 backdrop-blur-xl p-8 shadow-2xl overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16" />
             <div className="flex items-center gap-6 relative z-10">
@@ -252,6 +252,29 @@ export default function Contratacao({ user }) {
               </div>
             </div>
           </div>
+
+          {/* Selection Feedback Badge */}
+          {initialFormat && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center justify-between p-6 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                   <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400 opacity-80">Formato Selecionado</p>
+                   <p className="text-lg font-black text-foreground uppercase tracking-tight">{initialFormat}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Investimento Base</p>
+                 <p className="text-xl font-black text-foreground">R$ {Number(initialPrice).toLocaleString('pt-BR')}</p>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         <AnimatePresence mode="wait">

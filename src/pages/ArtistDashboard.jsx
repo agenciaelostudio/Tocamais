@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -13,8 +14,12 @@ import { MusicRepertoire } from '@/components/MusicRepertoire';
 import { SetlistManager } from '@/components/SetlistManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TipsSummary from '@/components/dashboard/TipsSummary';
+import { toast } from 'sonner';
 
 export default function ArtistDashboard({ user }) {
+  const queryClient = useQueryClient();
+  const [confirmingId, setConfirmingId] = useState(null);
+
   const { data: profile } = useQuery({
     queryKey: ['artistProfile', user.email],
     queryFn: async () => {
@@ -28,9 +33,38 @@ export default function ArtistDashboard({ user }) {
     queryFn: () => base44.entities.Proposal.filter({ artist_email: user.email }, '-created_date', 50),
   });
 
-  const { data: tips = [] } = useQuery({
-    queryKey: ['tips', user.email],
-    queryFn: () => base44.entities.Tip.filter({ artist_email: user.email }, '-created_date', 50),
+  // Gorjetas confirmadas (tabela gorjetas)
+  const { data: gorjetas = [] } = useQuery({
+    queryKey: ['gorjetas', profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('gorjetas')
+        .select('*')
+        .eq('artista_id', profile.id)
+        .eq('arquivado', false)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Pedidos aguardando confirmação de PIX
+  const { data: pedidosAguardando = [] } = useQuery({
+    queryKey: ['pedidos-aguardando', profile?.id],
+    enabled: !!profile?.id,
+    refetchInterval: 15000, // atualiza a cada 15s
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pedidos')
+        .select('*')
+        .eq('artista_id', profile.id)
+        .in('status', ['aguardando_confirmacao_pix', 'aguardando_pix'])
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const { data: events = [] } = useQuery({
@@ -38,9 +72,31 @@ export default function ArtistDashboard({ user }) {
     queryFn: () => base44.entities.Event.filter({ artist_email: user.email }, '-event_date', 20),
   });
 
-  const totalTips = tips.reduce((sum, t) => sum + (t.amount || 0), 0);
+  const totalTips = gorjetas.reduce((sum, g) => sum + (g.valor_liquido_artista || 0), 0);
   const pendingProposals = proposals.filter((p) => p.status === 'pending');
-  const queryClient = useQueryClient();
+
+  const handleConfirmarRecebimento = async (pedidoId) => {
+    if (!profile?.id) return;
+    setConfirmingId(pedidoId);
+    try {
+      const { data, error } = await supabase.rpc('confirm_pix_receipt', {
+        p_pedido_id: pedidoId,
+        p_artista_id: profile.id,
+      });
+      if (error) throw error;
+      if (data?.error) {
+        toast.error('Erro ao confirmar: ' + data.message || data.error);
+        return;
+      }
+      toast.success('Gorjeta confirmada! 🎉');
+      queryClient.invalidateQueries({ queryKey: ['gorjetas', profile.id] });
+      queryClient.invalidateQueries({ queryKey: ['pedidos-aguardando', profile.id] });
+    } catch (err) {
+      toast.error('Erro ao confirmar recebimento.');
+    } finally {
+      setConfirmingId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden -mt-6 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 py-8 md:py-12">
@@ -84,10 +140,19 @@ export default function ArtistDashboard({ user }) {
 
         <Tabs defaultValue="overview" className="space-y-8 md:space-y-10">
           <div className="flex items-center justify-center md:justify-start">
-            <TabsList className="bg-card/40 backdrop-blur-md border border-white/5 p-1.5 rounded-2xl h-14 w-full md:w-auto shadow-xl overflow-x-auto no-scrollbar">
+          <TabsList className="bg-card/40 backdrop-blur-md border border-white/5 p-1.5 rounded-2xl h-14 w-full md:w-auto shadow-xl overflow-x-auto no-scrollbar">
               <TabsTrigger value="overview" className="flex-1 md:flex-none items-center gap-2 px-8 rounded-xl data-[state=active]:bg-background/80 data-[state=active]:shadow-lg transition-all font-semibold">
                 <LayoutDashboard size={18} className="text-primary" />
                 Resumo
+              </TabsTrigger>
+              <TabsTrigger value="aguardando" className="flex-1 md:flex-none items-center gap-2 px-6 rounded-xl data-[state=active]:bg-background/80 data-[state=active]:shadow-lg transition-all font-semibold relative">
+                <AlertCircle size={18} className="text-amber-400" />
+                Aguardando PIX
+                {pedidosAguardando.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-black text-[10px] font-black flex items-center justify-center">
+                    {pedidosAguardando.length}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger value="repertorio" className="flex-1 md:flex-none items-center gap-2 px-8 rounded-xl data-[state=active]:bg-background/80 data-[state=active]:shadow-lg transition-all font-semibold">
                 <Music size={18} className="text-secondary" />
@@ -220,6 +285,67 @@ export default function ArtistDashboard({ user }) {
                   </div>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          {/* ===== ABA AGUARDANDO PIX ===== */}
+          <TabsContent value="aguardando" className="animate-in fade-in slide-in-from-bottom-6 duration-700 outline-none">
+            <div className="rounded-[2.5rem] bg-card/40 border border-white/5 backdrop-blur-xl p-8 md:p-12 shadow-2xl space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-400/10 flex items-center justify-center border border-amber-400/20">
+                    <AlertCircle className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <h2 className="font-heading font-black text-2xl">Confirmação de <span className="text-amber-400">PIX</span></h2>
+                </div>
+                <p className="text-muted-foreground text-sm">Estes fãs declararam que fizeram o PIX. Confira no seu app de banco e confirme o recebimento.</p>
+              </div>
+
+              {pedidosAguardando.length === 0 ? (
+                <div className="text-center py-20 bg-background/20 rounded-[3rem] border border-dashed border-white/10">
+                  <CheckCircle2 className="w-16 h-16 mx-auto mb-4 opacity-20 text-emerald-400" />
+                  <p className="text-muted-foreground font-medium">Nenhum PIX aguardando confirmação.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <AnimatePresence>
+                    {pedidosAguardando.map((pedido, idx) => (
+                      <motion.div
+                        key={pedido.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[1.75rem] bg-amber-400/5 border border-amber-400/20 hover:border-amber-400/40 transition-all"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-amber-400/10 flex items-center justify-center border border-amber-400/20 text-amber-400 font-black text-lg shrink-0">
+                            {pedido.cliente_nome?.[0] || 'A'}
+                          </div>
+                          <div>
+                            <p className="font-black text-base">{pedido.cliente_nome || 'Fã Anônimo'}</p>
+                            <p className="text-xs text-muted-foreground italic">{pedido.musica || 'Gorjeta sem pedido'}</p>
+                            <p className="text-xs text-amber-400 font-black mt-0.5">
+                              {pedido.valor ? `R$ ${Number(pedido.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}` : 'Valor não informado'}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => handleConfirmarRecebimento(pedido.id)}
+                          disabled={confirmingId === pedido.id}
+                          className="shrink-0 h-12 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-sm border-0 shadow-lg shadow-emerald-500/20"
+                        >
+                          {confirmingId === pedido.id ? (
+                            <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Confirmando...</span>
+                          ) : (
+                            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Confirmar Recebimento</span>
+                          )}
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
           </TabsContent>
 

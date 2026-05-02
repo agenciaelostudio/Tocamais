@@ -19,6 +19,7 @@ import {
   X,
   ShoppingBag,
   Zap,
+  Mic2,
 } from 'lucide-react';
 import Logo from '@/components/shared/Logo';
 import { base44 } from '@/api/base44Client';
@@ -67,7 +68,7 @@ export default function Sidebar({ userRole, user, mobileOpen, setMobileOpen }) {
   const NavContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-8 flex items-center justify-center lg:justify-center relative">
-        <Logo size="md" />
+        <Logo size="3xl" variant="sidebar" />
         <button 
           onClick={() => setMobileOpen(false)} 
           className="lg:hidden absolute right-8 p-2 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-xl transition-all"

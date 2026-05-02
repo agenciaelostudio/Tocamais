@@ -1,7 +1,12 @@
 import React from 'react';
 import logoImg from '@/assets/logo-tocamais.png';
 
-export default function Logo({ size = 'md' }) {
+export default function Logo({ size = 'md', variant = 'default' }) {
+  const images = {
+    default: logoImg,
+    sidebar: '/TocaMais App - Google.png', // Arquivo na pasta public
+  };
+
   const containerSizes = {
     sm: 'h-8 md:h-10',
     md: 'h-12 md:h-14',
@@ -15,11 +20,11 @@ export default function Logo({ size = 'md' }) {
 
   return (
     <div className="flex items-center group">
-      <div className={`relative ${containerSizes[size] || containerSizes.md} aspect-square`}>
+      <div className={`relative ${containerSizes[size] || containerSizes.md} ${variant === 'sidebar' ? 'aspect-auto w-full' : 'aspect-square'}`}>
         <img 
-          src={logoImg} 
+          src={images[variant] || images.default} 
           alt="TocaMais Logo" 
-          className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-110" 
+          className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105" 
         />
         <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>

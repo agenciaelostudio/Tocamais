@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Music, Star, Filter, ChevronRight, Users, User, Mic2, LayoutGrid } from 'lucide-react';
+import { ShoppingBag, Music, Star, Filter, ChevronRight, Users, User, Mic2, LayoutGrid, MapPin } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -108,7 +108,7 @@ function ArtistHireCard({ artist, onClick }) {
         {/* Formats Grid - Sophisticated */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Configurações de Palco</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">Formatos de Shows</p>
             <div className="h-px flex-1 bg-white/5 ml-4" />
           </div>
           <div className="grid grid-cols-2 gap-2">
