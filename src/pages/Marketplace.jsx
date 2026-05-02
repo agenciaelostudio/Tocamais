@@ -4,10 +4,11 @@ import { ShoppingBag, Music, Star, Filter, ChevronRight, Users, User, Mic2, Layo
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 
 const FORMAT_ICONS = {
   'Solo': User,
-  'Voz e Violão': Mic,
+  'Voz e Violão': Mic2,
   'Dupla': Users,
   'Trio': Users,
   'Banda': LayoutGrid,
@@ -111,7 +112,7 @@ function ArtistHireCard({ artist, onClick }) {
           </div>
           <div className="grid grid-cols-2 gap-2">
             {formats.slice(0, 4).map((fmt) => {
-              const Icon = FORMAT_ICONS[fmt] || Mic;
+              const Icon = FORMAT_ICONS[fmt] || Mic2;
               return (
                 <div key={fmt} className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 group/fmt hover:bg-primary/10 hover:border-primary/20 transition-all duration-300">
                   <div className="w-8 h-8 rounded-xl bg-background/40 flex items-center justify-center shadow-inner group-hover/fmt:scale-110 transition-transform">
@@ -149,6 +150,10 @@ export default function Hire({ user }) {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden -mt-6 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 py-8 md:py-12">
+      <SEOHead 
+        title="Contratar Shows — TocaMais" 
+        description="Encontre o formato ideal de show para o seu evento e contrate agora." 
+      />
       <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
       <div className="fixed bottom-0 left-0 w-[40%] h-[40%] bg-secondary/10 blur-[100px] rounded-full pointer-events-none -z-10" />
 

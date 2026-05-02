@@ -8,7 +8,9 @@ ALTER TABLE public.artist_profiles
   ADD COLUMN IF NOT EXISTS pix_chave text,
   ADD COLUMN IF NOT EXISTS pix_tipo_chave text DEFAULT 'aleatoria',
   ADD COLUMN IF NOT EXISTS show_formats jsonb DEFAULT '{}'::jsonb,
-  ADD COLUMN IF NOT EXISTS tour_complete boolean DEFAULT false;
+  ADD COLUMN IF NOT EXISTS tour_complete boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS is_pro boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS slug text UNIQUE;
 
 -- 2. Atualizar tabela pedidos: adicionar coluna valor + novos status
 ALTER TABLE public.pedidos
@@ -178,7 +180,7 @@ BEGIN
 END;
 $$;
 
--- 7. RPC: artista confirma recebimento (sem limite Free)
+-- 7. RPC: artista confirma recebimento (com split 30% para Free)
 CREATE OR REPLACE FUNCTION public.confirm_pix_receipt(
   p_pedido_id uuid,
   p_artista_id uuid
@@ -190,7 +192,11 @@ SET search_path = public
 AS $$
 DECLARE
   v_pedido pedidos%ROWTYPE;
+  v_artista artist_profiles%ROWTYPE;
   v_gorjeta_id uuid;
+  v_taxa_percent numeric;
+  v_taxa_valor numeric;
+  v_valor_liquido numeric;
 BEGIN
   -- Buscar pedido
   SELECT * INTO v_pedido
@@ -202,6 +208,9 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'PEDIDO_NAO_ENCONTRADO');
   END IF;
 
+  -- Buscar informações do artista (para ver se é Pro)
+  SELECT * INTO v_artista FROM artist_profiles WHERE id = p_artista_id;
+
   -- Validar status
   IF v_pedido.status NOT IN ('aguardando_confirmacao_pix', 'aguardando_pix') THEN
     RETURN jsonb_build_object('success', false, 'error', 'STATUS_INVALIDO', 'status_atual', v_pedido.status);
@@ -212,7 +221,17 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'VALOR_INVALIDO');
   END IF;
 
-  -- Criar gorjeta (taxa = 0, 100% para o artista)
+  -- Calcular Taxa (30% se não for Pro)
+  IF v_artista.is_pro THEN
+    v_taxa_percent := 0;
+  ELSE
+    v_taxa_percent := 0.30;
+  END IF;
+
+  v_taxa_valor := ROUND(v_pedido.valor * v_taxa_percent, 2);
+  v_valor_liquido := v_pedido.valor - v_taxa_valor;
+
+  -- Criar gorjeta
   INSERT INTO gorjetas (
     artista_id,
     cliente_id,
@@ -231,8 +250,8 @@ BEGIN
     v_pedido.cliente_nome,
     v_pedido.session_id,
     v_pedido.valor,
-    v_pedido.valor,  -- 100% para o artista
-    0,               -- sem taxa
+    v_valor_liquido,
+    v_taxa_valor,
     'approved',
     v_pedido.id,
     v_pedido.musica,
@@ -246,7 +265,7 @@ BEGIN
         updated_at = now()
   WHERE id = p_pedido_id;
 
-  -- Atualizar contador total do artista
+  -- Atualizar contador total do artista (valor bruto ou líquido? Geralmente bruto para estatísticas)
   UPDATE artist_profiles
     SET total_tips = COALESCE(total_tips, 0) + v_pedido.valor,
         updated_at = now()
@@ -255,7 +274,9 @@ BEGIN
   RETURN jsonb_build_object(
     'success', true,
     'gorjeta_id', v_gorjeta_id,
-    'valor', v_pedido.valor
+    'valor_bruto', v_pedido.valor,
+    'valor_liquido', v_valor_liquido,
+    'taxa', v_taxa_valor
   );
 END;
 $$;

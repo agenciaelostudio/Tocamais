@@ -41,7 +41,8 @@ const BioReadMore = memo(({ bio }) => {
 BioReadMore.displayName = "BioReadMore";
 
 const ArtistPublicProfile = ({ user }) => {
-  const { id } = useParams();
+  const { id, idOrSlug } = useParams();
+  const artistIdentifier = id || idOrSlug;
   const navigate = useNavigate();
   const location = useLocation();
   const sessionId = useSessionId();
@@ -97,13 +98,32 @@ const ArtistPublicProfile = ({ user }) => {
 
   useEffect(() => {
     fetchArtist();
-  }, [id]);
+  }, [artistIdentifier]);
 
   const fetchArtist = useCallback(async () => {
-    if (!id) return;
+    if (!artistIdentifier) return;
     try {
-      const profiles = await base44.entities.ArtistProfile.filter({ id });
-      const p = profiles[0];
+      // Tentar buscar por ID primeiro, depois por Slug
+      let p = null;
+      
+      // Tenta ID (pode ser UUID ou string mock)
+      try {
+        const byId = await base44.entities.ArtistProfile.filter({ id: artistIdentifier });
+        if (byId?.[0]) p = byId[0];
+      } catch (e) {
+        // Se falhar (ex: UUID inválido no Supabase), ignora e tenta Slug
+      }
+      
+      if (!p) {
+        const bySlug = await base44.entities.ArtistProfile.filter({ slug: artistIdentifier });
+        if (bySlug?.[0]) p = bySlug[0];
+      }
+
+      if (!p) {
+        // Fallback final: talvez o artistIdentifier seja o ID mas falhou no filtro anterior
+        const allArtists = await base44.entities.ArtistProfile.filter({ is_active: true });
+        p = allArtists.find(a => a.id === artistIdentifier || a.slug === artistIdentifier);
+      }
 
       if (!p) {
         toast.error("Artista não encontrado");
@@ -130,7 +150,7 @@ const ArtistPublicProfile = ({ user }) => {
         setPixInfo({ pix_chave: p.pix_chave, pix_tipo_chave: p.pix_tipo_chave || "aleatoria" });
       }
 
-      const m = await base44.entities.RepertoireSong.filter({ artista_id: id }, 'titulo');
+      const m = await base44.entities.RepertoireSong.filter({ artista_id: p.id }, 'titulo');
       setMusicas(m || []);
       
     } catch (e) {

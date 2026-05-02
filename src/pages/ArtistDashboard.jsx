@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/integrations/supabase/client';
-import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock, AlertCircle, CheckCircle2, QrCode } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import { SetlistManager } from '@/components/SetlistManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TipsSummary from '@/components/dashboard/TipsSummary';
 import { toast } from 'sonner';
+import { SEOHead } from '@/components/SEOHead';
+import ArtistQRCard from '@/components/dashboard/ArtistQRCard';
 
 export default function ArtistDashboard({ user }) {
   const queryClient = useQueryClient();
@@ -100,6 +102,7 @@ export default function ArtistDashboard({ user }) {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden -mt-6 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 py-8 md:py-12">
+      <SEOHead title="Painel do Artista — TocaMais" description="Gerencie sua agenda, gorjetas e propostas de show." />
       {/* Background Decorative Elements */}
       <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
       <div className="fixed bottom-0 left-0 w-[40%] h-[40%] bg-secondary/10 blur-[100px] rounded-full pointer-events-none -z-10" />
@@ -158,6 +161,10 @@ export default function ArtistDashboard({ user }) {
                 <Music size={18} className="text-secondary" />
                 Repertório
               </TabsTrigger>
+              <TabsTrigger value="divulgacao" className="flex-1 md:flex-none items-center gap-2 px-8 rounded-xl data-[state=active]:bg-background/80 data-[state=active]:shadow-lg transition-all font-semibold">
+                <QrCode size={18} className="text-purple-400" />
+                Divulgação
+              </TabsTrigger>
               <TabsTrigger value="agenda" className="flex-1 md:flex-none items-center gap-2 px-8 rounded-xl data-[state=active]:bg-background/80 data-[state=active]:shadow-lg transition-all font-semibold">
                 <Calendar size={18} className="text-yellow-400" />
                 Agenda
@@ -168,6 +175,12 @@ export default function ArtistDashboard({ user }) {
               </TabsTrigger>
             </TabsList>
           </div>
+
+          <TabsContent value="divulgacao" className="space-y-8 outline-none">
+             <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
+                <ArtistQRCard artistId={profile?.id} artistName={profile?.stage_name} artistSlug={profile?.slug} />
+             </div>
+          </TabsContent>
 
           <TabsContent value="overview" className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 outline-none">
             {/* Stats Grid */}

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ArtistCard from '@/components/cards/ArtistCard';
+import { SEOHead } from '@/components/SEOHead';
 
 const GENRES = ['Sertanejo', 'MPB', 'Rock', 'Pop', 'Pagode', 'Forró', 'Jazz', 'Blues', 'Eletrônica', 'Reggae', 'Samba', 'Funk', 'Outro'];
 
@@ -43,6 +44,10 @@ export default function Explore() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden -mt-6 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 pb-20 pt-8">
+      <SEOHead 
+        title="Explorar Talentos — TocaMais" 
+        description="Descubra os melhores artistas para o seu evento ou para curtir ao vivo." 
+      />
       {/* Background Decorative Elements */}
       <div className="fixed top-[-10%] right-[-10%] w-[70%] h-[70%] bg-primary/10 blur-[150px] rounded-full pointer-events-none -z-10" />
       <div className="fixed bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-secondary/10 blur-[120px] rounded-full pointer-events-none -z-10" />

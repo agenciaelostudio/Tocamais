@@ -41,10 +41,18 @@ const AuthenticatedApp = () => {
   const location = useLocation();
 
   // Define routes that can be accessed without authentication
+  const publicPaths = ['/queue', '/explore'];
+  const privatePaths = [
+    '/dashboard', '/contratar', '/proposals', '/events', '/tips', 
+    '/favorites', '/artist-profile', '/venue', '/chat', 
+    '/marketplace', '/contratar-show', '/my-reviews', 
+    '/notifications', '/settings', '/'
+  ];
+
   const isPublicRoute = 
     location.pathname.startsWith('/artist/') || 
-    location.pathname === '/queue' || 
-    location.pathname === '/explore'; // Allowing explore as public for now to improve discovery
+    publicPaths.includes(location.pathname) ||
+    (!privatePaths.filter(p => p !== '/').some(path => location.pathname.startsWith(path)) && location.pathname !== '/');
 
   if (isLoadingAuth) {
     return <LoadingScreen />;
@@ -86,6 +94,9 @@ const AuthenticatedApp = () => {
         <Route path="/my-reviews" element={user ? <MyReviews user={user} /> : <Navigate to="/onboarding" />} />
         <Route path="/notifications" element={user ? <Notifications user={user} /> : <Navigate to="/onboarding" />} />
         <Route path="/settings" element={user ? <Settings user={user} /> : <Navigate to="/onboarding" />} />
+        
+        {/* Dynamic Artist Slug - Must be last to not conflict with fixed routes */}
+        <Route path="/:idOrSlug" element={<ArtistPublicProfile user={user} />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

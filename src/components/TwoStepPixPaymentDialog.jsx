@@ -87,34 +87,49 @@ export function TwoStepPixPaymentDialog({
     }
   };
 
+  const activePixInfo = useMemo(() => {
+    if (isPro) {
+      return { 
+        key: pixChave, 
+        type: pixTipoChave || 'aleatoria', 
+        name: artistaNome 
+      };
+    }
+    return { 
+      key: PLATFORM_CONFIG.pix.key, 
+      type: PLATFORM_CONFIG.pix.type, 
+      name: PLATFORM_CONFIG.pix.merchant_name 
+    };
+  }, [isPro, pixChave, pixTipoChave, artistaNome]);
+
   const pixCopiaCola = useMemo(() => {
-    if (!pixChave || !pixTipoChave) return null;
+    if (!activePixInfo.key || !activePixInfo.type) return null;
     try {
       const valor = parseCurrencyToNumber(valorGorjeta);
       return generatePixPayload({
-        pixKey: pixChave,
-        keyType: pixTipoChave,
-        merchantName: artistaNome,
+        pixKey: activePixInfo.key,
+        keyType: activePixInfo.type,
+        merchantName: activePixInfo.name,
         merchantCity: 'BRASIL',
         amount: valor && valor >= 1 ? valor : undefined
       });
     } catch {
       return null;
     }
-  }, [pixChave, pixTipoChave, artistaNome, valorGorjeta]);
+  }, [activePixInfo, valorGorjeta]);
 
   useEffect(() => {
     if (step !== 'pagamento') return;
     const generateQr = async () => {
-      if (!pixChave || !pixTipoChave) return;
+      if (!activePixInfo.key || !activePixInfo.type) return;
       const valor = parseCurrencyToNumber(valorGorjeta);
       if (valor >= 1) {
         setGeneratingQr(true);
         try {
           const qrDataUrl = await generatePixQRCodeDataUrl({
-            pixKey: pixChave,
-            keyType: pixTipoChave,
-            merchantName: artistaNome,
+            pixKey: activePixInfo.key,
+            keyType: activePixInfo.type,
+            merchantName: activePixInfo.name,
             merchantCity: 'BRASIL',
             amount: valor
           });
@@ -130,7 +145,7 @@ export function TwoStepPixPaymentDialog({
     };
     const timeoutId = setTimeout(generateQr, 500);
     return () => clearTimeout(timeoutId);
-  }, [valorGorjeta, pixChave, pixTipoChave, artistaNome, step]);
+  }, [valorGorjeta, activePixInfo, step]);
 
   const handleCopyPixCode = async () => {
     if (!pixCopiaCola) return;
@@ -408,7 +423,7 @@ export function TwoStepPixPaymentDialog({
                     </p>
                     {!isPro && (
                       <p className="text-[10px] text-primary font-black uppercase tracking-widest bg-primary/10 py-1 px-3 rounded-full inline-block border border-primary/20">
-                        Contribuição Plataforma Tocamais (Taxa 20%)
+                        Contribuição Plataforma Tocamais (Taxa 30%)
                       </p>
                     )}
                   </div>
@@ -543,7 +558,7 @@ export function TwoStepPixPaymentDialog({
                       Show de Apoio!
                    </h2>
                    <p className="text-muted-foreground font-medium text-lg leading-relaxed max-w-xs mx-auto">
-                      Sua gorjeta foi enviada. {artistaNome} acaba de ser notificado e seu pedido está na fila!
+                      Sua gorjeta foi enviada para processamento. {artistaNome} foi notificado e, assim que confirmar o recebimento, seu pedido entrará na fila!
                    </p>
                 </div>
 

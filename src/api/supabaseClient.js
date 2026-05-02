@@ -13,9 +13,9 @@ export function getSupabase() {
     // Return a proxy that logs warnings for any property access/call
     return new Proxy({}, {
       get: (target, prop) => {
-        return () => ({
+        const mockMethods = {
           from: () => ({
-            select: () => ({ order: () => ({ limit: () => Promise.resolve({ data: [], error: null }) }) }),
+            select: () => ({ order: () => ({ limit: () => Promise.resolve({ data: [], error: null }), eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }), eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }),
             insert: () => ({ select: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }),
             update: () => ({ eq: () => ({ select: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }) }),
             delete: () => ({ eq: () => Promise.resolve({ data: null, error: null }) }),
@@ -25,6 +25,7 @@ export function getSupabase() {
             signInWithPassword: () => Promise.reject('Supabase not configured'),
             signUp: () => Promise.reject('Supabase not configured'),
             signOut: () => Promise.resolve(),
+            onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
             updateUser: () => Promise.resolve({ data: {}, error: null }),
           },
           storage: {
@@ -33,7 +34,8 @@ export function getSupabase() {
               getPublicUrl: () => ({ data: { publicUrl: '' } }),
             }),
           },
-        })[prop] || (() => ({ data: null, error: null }));
+        };
+        return mockMethods[prop] || (() => ({ data: null, error: null }));
       }
     });
   }

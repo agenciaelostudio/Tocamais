@@ -6,7 +6,7 @@ export const PLATFORM_CONFIG = {
     merchant_city: "SAO PAULO"
   },
   fees: {
-    free_artist_percentage: 0.20, // 20%
+    free_artist_percentage: 0.30, // 30%
     pro_artist_percentage: 0.00   // 0%
   }
 };

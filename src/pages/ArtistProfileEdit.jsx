@@ -17,7 +17,7 @@ const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domi
 export default function ArtistProfileEdit({ user }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
-    stage_name: '', bio: '', city: '', state: '', base_price: 0,
+    stage_name: '', slug: '', bio: '', city: '', state: '', base_price: 0,
     genres: [], performance_types: [], available_days: [],
     social_links: { instagram: '', youtube: '', spotify: '' },
     show_formats: {},
@@ -37,6 +37,7 @@ export default function ArtistProfileEdit({ user }) {
     if (profile) {
       setForm({
         stage_name: profile.stage_name || '',
+        slug: profile.slug || '',
         bio: profile.bio || '',
         city: profile.city || '',
         state: profile.state || '',
@@ -89,6 +90,24 @@ export default function ArtistProfileEdit({ user }) {
   };
 
   const toggleArray = (arr, val) => arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
+
+  const slugify = (text) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  };
+
+  const handleSlugChange = (e) => {
+    const val = slugify(e.target.value);
+    setForm(prev => ({ ...prev, slug: val }));
+  };
 
   if (isLoading) return (
     <div className="min-h-[60vh] flex items-center justify-center">
@@ -215,6 +234,19 @@ export default function ArtistProfileEdit({ user }) {
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Nome Artístico</Label>
                 <Input value={form.stage_name} onChange={(e) => setForm({ ...form, stage_name: e.target.value })} className="h-14 rounded-2xl bg-white/5 border-white/10 text-lg font-bold focus:ring-primary/20" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">URL Personalizada (Slug)</Label>
+                <div className="relative group/slug">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-bold opacity-40">tocamais.app/</span>
+                  <Input 
+                    value={form.slug} 
+                    onChange={handleSlugChange} 
+                    placeholder="seu-nome"
+                    className="h-14 pl-28 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" 
+                  />
+                </div>
+                <p className="text-[9px] text-muted-foreground ml-1 font-medium italic opacity-60">Seu link público será: <span className="text-primary font-bold">tocamais.app/{form.slug || 'seu-nome'}</span></p>
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cachê Base (R$)</Label>

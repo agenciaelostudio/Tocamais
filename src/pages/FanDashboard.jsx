@@ -7,6 +7,7 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import ArtistCard from '@/components/cards/ArtistCard';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function FanDashboard({ user }) {
   const { data: favorites = [] } = useQuery({
@@ -38,6 +39,7 @@ export default function FanDashboard({ user }) {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden -mt-6 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 py-8 md:py-12">
+      <SEOHead title="Painel do Fan — TocaMais" description="Acompanhe seus artistas favoritos e impacto na cena musical." />
       {/* Background Decorative Elements */}
       <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
       <div className="fixed bottom-0 left-0 w-[40%] h-[40%] bg-secondary/10 blur-[100px] rounded-full pointer-events-none -z-10" />

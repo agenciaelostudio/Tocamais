@@ -67,6 +67,20 @@ function withNormalizedRecords(records) {
   return (records ?? []).map(normalizeRecord);
 }
 
+function generateSlug(text) {
+  if (!text) return 'artista-' + Math.random().toString(36).substr(2, 5);
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}
+
 async function runQuery(queryPromise) {
   const { data, error } = await queryPromise;
   if (error) throw error;
@@ -271,6 +285,7 @@ async function ensureRoleRecordsMock(user) {
         available_days: [],
         social_links: {},
         is_active: true,
+        slug: generateSlug(user.full_name || user.email?.split('@')[0]),
       }];
       saveLocalDB(db);
     }
@@ -300,6 +315,7 @@ async function ensureRoleRecords(user) {
         available_days: [],
         social_links: {},
         is_active: true,
+        slug: generateSlug(user.full_name || user.email?.split('@')[0]),
       });
       if (createError) throw createError;
     }
