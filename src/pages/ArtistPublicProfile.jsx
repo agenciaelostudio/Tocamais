@@ -189,8 +189,8 @@ const ArtistPublicProfile = ({ user }) => {
   }, [sessionId, artist, musica, mensagem, clienteNomePedido, currentUserId]);
 
   const handleGoBack = useCallback(() => navigate("/explore"), [navigate]);
-  const handleOpenPix = useCallback(() => setDirectPixDialogOpen(true), []);
-  const handleCustomMusic = useCallback(() => { setMusicaCustomizada(true); setMusica(""); }, []);
+  const handleOpenPix = useCallback(() => navigate(`/pedido/${artist?.id}?step=2`), [navigate, artist?.id]);
+  const handleCustomMusic = useCallback(() => navigate(`/pedido/${artist?.id}`), [navigate, artist?.id]);
   const handleViewQueue = useCallback(() => navigate(`/queue?artista=${artist?.id}`), [navigate, artist?.id]);
   const handleContratacao = useCallback(() => navigate(`/contratar/${artist?.id}`), [navigate, artist?.id]);
 
@@ -298,7 +298,7 @@ const ArtistPublicProfile = ({ user }) => {
                       size="lg" 
                       variant="outline"
                       className="rounded-2xl text-base font-black px-8 h-16 bg-white/5 backdrop-blur-xl border-white/10 text-white hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 group" 
-                      onClick={() => tipCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                      onClick={() => navigate(`/pedido/${artist.id}`)}
                     >
                       <Music className="w-5 h-5 mr-2 text-primary group-hover:rotate-12 transition-transform" /> 
                       PEDIR MÚSICA
@@ -327,201 +327,63 @@ const ArtistPublicProfile = ({ user }) => {
             </div>
           </div>
         </div>
-
+        
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 max-w-5xl mx-auto">
-          {/* Main Interaction Column */}
-          <div className="lg:col-span-7 space-y-6 md:space-y-8">
-            
-            {/* Voting Widget - Prominent when Live */}
+          <div className="lg:col-span-7 space-y-6">
             {artist.ativo_ao_vivo && (
-              <div className="animate-fade-in-up">
-                <VotacaoFa artistaId={artist.id} userId={currentUserId} />
-              </div>
+              <VotacaoFa artistaId={artist.id} userId={currentUserId} />
             )}
-
-            {/* Song Request & Tip Card */}
-            <div ref={tipCardRef} className="rounded-[2.5rem] bg-card/40 border border-white/5 backdrop-blur-3xl overflow-hidden relative shadow-2xl">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-primary opacity-50" />
-              <div className="p-8 md:p-12 space-y-8">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-primary/20 rounded-xl border border-primary/20">
-                      <Music className="w-6 h-6 text-primary" />
-                    </div>
-                    <h2 className="text-3xl font-heading font-black tracking-tight">Interatividade</h2>
-                  </div>
-                  <p className="text-muted-foreground font-medium text-base">Peça sua música favorita ou envie um apoio ao artista.</p>
+            
+            <div className="rounded-3xl bg-card/20 border border-white/5 p-8 backdrop-blur-xl">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <ListMusic className="h-5 w-5 text-primary" />
+                Repertório
+              </h3>
+              {musicas.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {musicas.slice(0, 15).map(m => (
+                    <Badge 
+                      key={m.id} 
+                      variant="outline" 
+                      className="bg-white/5 border-white/10 hover:bg-white/10 cursor-pointer transition-all"
+                      onClick={() => navigate(`/pedido/${artist.id}`)}
+                    >
+                      {m.titulo}
+                    </Badge>
+                  ))}
+                  {musicas.length > 15 && (
+                    <span className="text-xs text-muted-foreground self-center">+{musicas.length - 15} músicas</span>
+                  )}
                 </div>
-
-                <div className="space-y-6">
-                  <div className="space-y-2.5">
-                    <Label htmlFor="clienteNome" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Seu Nome / Mesa <span className="opacity-40">(Opcional)</span></Label>
-                    <Input 
-                      id="clienteNome" 
-                      placeholder="Ex: João - Mesa 04" 
-                      value={clienteNomePedido} 
-                      onChange={(e) => setClienteNomePedido(e.target.value)} 
-                      maxLength={30} 
-                      className="h-14 rounded-2xl bg-white/[0.03] border-white/10 text-lg font-bold placeholder:text-white/10 focus:ring-primary/20" 
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Escolha no Repertório</Label>
-                    
-                    {musicas.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {musicas.slice(0, 3).map(m => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => {
-                              setMusica(m.titulo);
-                              setMusicaCustomizada(false);
-                            }}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                              musica === m.titulo && !musicaCustomizada
-                                ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                                : 'bg-white/5 text-muted-foreground border-white/5 hover:bg-white/10'
-                            }`}
-                          >
-                            {m.titulo}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {musicas.length > 0 ? (
-                      !musicaCustomizada ? (
-                        <div className="space-y-4">
-                          <MusicCombobox open={openMusicCombobox} onOpenChange={setOpenMusicCombobox} items={musicas} selectedTitle={musica} onSelectTitle={setMusica} triggerPlaceholder="Selecione ou busque no repertório..." searchPlaceholder="Qual música quer ouvir?" forceDrawer />
-                          <button 
-                            type="button" 
-                            className="text-xs text-primary/60 hover:text-primary transition-all font-black uppercase tracking-[0.2em] flex items-center gap-2" 
-                            onClick={handleCustomMusic}
-                          >
-                            <Sparkles className="w-3.5 h-3.5" /> Digitar nome da música
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <Input 
-                            placeholder="Música - Cantor" 
-                            value={musica} 
-                            onChange={(e) => setMusica(e.target.value)} 
-                            className="h-14 rounded-2xl bg-white/[0.03] border-white/10 text-lg font-bold placeholder:text-white/10 focus:ring-primary/20" 
-                          />
-                          <button 
-                            type="button" 
-                            className="text-xs text-muted-foreground/60 hover:text-foreground transition-all font-black uppercase tracking-[0.2em]" 
-                            onClick={() => { setMusicaCustomizada(false); setMusica(""); }}
-                          >
-                            Voltar para o repertório
-                          </button>
-                        </div>
-                      )
-                    ) : (
-                      <Input 
-                        placeholder="Ex: Evidências - Chitãozinho & Xororó" 
-                        value={musica} 
-                        onChange={(e) => setMusica(e.target.value)} 
-                        className="h-14 rounded-2xl bg-white/[0.03] border-white/10 text-lg font-bold placeholder:text-white/10 focus:ring-primary/20" 
-                      />
-                    )}
-                  </div>
-
-                  <div className="pt-4 space-y-4">
-                    {pixInfo.pix_chave ? (
-                      <>
-                        <Button 
-                          className="w-full h-20 text-lg font-black bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-white border-0 shadow-2xl shadow-emerald-500/20 rounded-[1.5rem] hover:scale-[1.02] active:scale-[0.98] transition-all group" 
-                          onClick={handleOpenPix} 
-                          disabled={!musica.trim()}
-                        >
-                          <Heart className="w-6 h-6 mr-3 fill-white/20 group-hover:scale-110 transition-transform" /> 
-                          PEDIR COM GORJETA (PIX)
-                        </Button>
-                        <button 
-                          className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 hover:text-foreground transition-all" 
-                          onClick={handleSendRequest} 
-                          disabled={requestLoading || !musica.trim()}
-                        >
-                          {requestLoading ? "ENVIANDO..." : "APENAS ENVIAR O PEDIDO"}
-                        </button>
-                      </>
-                    ) : (
-                      <Button 
-                        className="w-full h-20 text-lg font-black bg-primary/20 hover:bg-primary/30 text-primary border border-primary/10 rounded-[1.5rem] transition-all" 
-                        onClick={handleSendRequest} 
-                        disabled={requestLoading || !musica.trim()}
-                      >
-                        <MessageCircleHeart className="w-6 h-6 mr-3" /> 
-                        {requestLoading ? "ENVIANDO..." : "ENVIAR PEDIDO"}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              ) : (
+                <p className="text-sm text-muted-foreground italic">Nenhuma música cadastrada no repertório.</p>
+              )}
             </div>
           </div>
 
-          {/* Sidebar Column */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="rounded-3xl bg-card/20 border border-white/5 p-6 backdrop-blur-sm">
-              <h3 className="text-lg font-heading font-bold mb-4 flex items-center gap-2"><ListMusic className="w-5 h-5 text-secondary" /> O que rola no show?</h3>
-              {musicas.length > 0 ? (
-                 <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground mb-4">Confira algumas das músicas mais tocadas por {artist.nome}.</p>
-                    <div className="flex flex-wrap gap-2">
-                       {musicas.slice(0, 12).map(m => (
-                         <Badge 
-                           key={m.id} 
-                           variant="outline" 
-                           className="bg-background/50 border-white/10 text-xs py-1.5 px-3 rounded-lg font-normal text-muted-foreground hover:text-primary hover:border-primary/30 cursor-pointer transition-all active:scale-95"
-                           onClick={() => {
-                             setMusica(m.titulo);
-                             setMusicaCustomizada(false);
-                             tipCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                             toast.info(`Música "${m.titulo}" selecionada! ✨`);
-                           }}
-                         >
-                           {m.titulo}
-                         </Badge>
-                       ))}
-                       {musicas.length > 12 && <Badge variant="outline" className="bg-background/20 border-white/5 text-xs py-1.5 px-3 rounded-lg text-primary/70">+{musicas.length - 12} músicas</Badge>}
-                    </div>
-                 </div>
-              ) : (
-                 <p className="text-sm text-muted-foreground">O artista ainda não adicionou o repertório completo.</p>
-              )}
-            </div>
-            
-            <Button variant="ghost" className="w-full h-14 rounded-2xl bg-card/30 border border-white/5 text-muted-foreground hover:text-foreground hover:bg-card/50 transition-all group" onClick={handleViewQueue}>
-              <Users className="w-5 h-5 mr-3 text-muted-foreground group-hover:text-primary transition-colors" />
-              Ver Fila de Pedidos ao Vivo
+            <Button 
+              variant="ghost" 
+              className="w-full h-20 rounded-3xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all group"
+              onClick={() => navigate(`/pedido/${artist.id}`)}
+            >
+              <div className="flex flex-col items-center">
+                <span className="text-lg font-black uppercase tracking-widest">Fazer um Pedido</span>
+                <span className="text-[10px] opacity-60">Grátis ou com Gorjeta</span>
+              </div>
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              className="w-full h-14 rounded-2xl bg-white/5 border border-white/10 text-muted-foreground hover:text-white transition-all"
+              onClick={handleViewQueue}
+            >
+              <Users className="h-5 w-5 mr-3" />
+              Fila de Pedidos
             </Button>
           </div>
         </div>
-
       </main>
-
-      {artist && (
-        <TwoStepPixPaymentDialog 
-          open={directPixDialogOpen} 
-          onOpenChange={setDirectPixDialogOpen} 
-          artistaId={artist.id} 
-          artistaNome={artist.nome} 
-          pixChave={pixInfo.pix_chave} 
-          pixTipoChave={pixInfo.pix_tipo_chave || "aleatoria"} 
-          isPro={isPro}
-          clienteId={currentUserId} 
-          sessionId={sessionId} 
-          musicas={musicas} 
-          initialMusica={musica} 
-          initialClienteNome={clienteNomePedido} 
-          onSuccess={() => { if (!user) setShowWelcome(true); }}
-        />
-      )}
 
       <GuestWelcomeBanner open={showWelcome} onOpenChange={setShowWelcome} />
     </div>

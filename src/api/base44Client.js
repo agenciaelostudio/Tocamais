@@ -276,6 +276,11 @@ async function ensureRoleRecordsMock(user) {
         bio: user.bio || '',
         city: user.city || '',
         state: user.state || '',
+        cep: user.cep || '',
+        address: user.address || '',
+        address_number: user.address_number || '',
+        neighborhood: user.neighborhood || '',
+        complement: user.complement || '',
         genres: [],
         performance_types: [],
         base_price: 0,
@@ -288,36 +293,73 @@ async function ensureRoleRecordsMock(user) {
         slug: generateSlug(user.full_name || user.email?.split('@')[0]),
       }];
       saveLocalDB(db);
+    } else {
+      // Sync basic info if changed
+      let changed = false;
+      if (!exists.city && user.city) { exists.city = user.city; changed = true; }
+      if (!exists.state && user.state) { exists.state = user.state; changed = true; }
+      if (!exists.bio && user.bio) { exists.bio = user.bio; changed = true; }
+      if (changed) saveLocalDB(db);
     }
   }
 }
 
 async function ensureRoleRecords(user) {
+  if (!isSupabaseConfigured) {
+    const db = getLocalDB();
+    if (!db.entities) db.entities = {};
+    
+    if (user.role === 'artist') {
+      const existing = (db.entities.ArtistProfile || []).find(a => a.user_email === user.email);
+      if (!existing) {
+        const newArtist = {
+          id: crypto.randomUUID(),
+          user_email: user.email,
+          stage_name: user.full_name || user.email?.split('@')[0] || 'Artista',
+          bio: '',
+          city: user.city || '',
+          state: user.state || '',
+          genres: [],
+          performance_types: [],
+          base_price: 0,
+          created_at: new Date().toISOString()
+        };
+        db.entities.ArtistProfile = [...(db.entities.ArtistProfile || []), newArtist];
+        saveLocalDB(db);
+      }
+    }
+    
+    if (user.role === 'bar_owner') {
+      const existing = (db.entities.Venue || []).find(v => v.owner_email === user.email);
+      if (!existing) {
+        const newVenue = {
+          id: crypto.randomUUID(),
+          owner_email: user.email,
+          name: '',
+          city: user.city || '',
+          state: user.state || '',
+          created_at: new Date().toISOString()
+        };
+        db.entities.Venue = [...(db.entities.Venue || []), newVenue];
+        saveLocalDB(db);
+      }
+    }
+    return;
+  }
+
   const supabase = getSupabase();
 
   if (user.role === 'artist') {
-    const { data, error } = await supabase.from('artist_profiles').select('id').eq('user_email', user.email).limit(1);
+    const { data, error } = await supabase.from('artist_profiles').select('*').eq('user_email', user.email).limit(1);
     if (error) throw error;
     if (!data?.length) {
-      const { error: createError } = await supabase.from('artist_profiles').insert({
+      await supabase.from('artist_profiles').insert({
         user_id: user.id,
         user_email: user.email,
         stage_name: user.full_name || user.email,
-        bio: user.bio || '',
-        city: user.city || '',
-        state: user.state || '',
-        genres: [],
-        performance_types: [],
-        base_price: 0,
-        avg_rating: 0,
-        total_reviews: 0,
-        total_tips: 0,
-        available_days: [],
-        social_links: {},
         is_active: true,
         slug: generateSlug(user.full_name || user.email?.split('@')[0]),
       });
-      if (createError) throw createError;
     }
   }
 
@@ -325,26 +367,54 @@ async function ensureRoleRecords(user) {
     const { data, error } = await supabase.from('venues').select('id').eq('owner_email', user.email).limit(1);
     if (error) throw error;
     if (!data?.length) {
-      const { error: createError } = await supabase.from('venues').insert({
+      await supabase.from('venues').insert({
         owner_email: user.email,
         name: '',
-        description: '',
-        address: '',
-        city: user.city || '',
-        state: user.state || '',
-        photo_url: null,
-        capacity: 0,
-        phone: user.phone || '',
       });
-      if (createError) throw createError;
     }
   }
 }
 
 async function uploadFile({ file }) {
   if (!isSupabaseConfigured) {
-    // Return a dummy image or a blob URL for local testing
-    return { file_url: URL.createObjectURL(file) };
+    // Compress image and convert to Base64 for persistence in LocalStorage mock
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const max_size = 1200; // Max dimension
+          
+          if (width > height) {
+            if (width > max_size) {
+              height *= max_size / width;
+              width = max_size;
+            }
+          } else {
+            if (height > max_size) {
+              width *= max_size / height;
+              height = max_size;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Quality 0.7 to keep it under LocalStorage limits
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          resolve({ file_url: compressed });
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   const supabase = getSupabase();

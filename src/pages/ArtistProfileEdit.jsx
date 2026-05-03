@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Music, Save, Upload, MapPin, DollarSign, Instagram, Youtube, Play, Globe, ChevronDown, Link2, Video } from 'lucide-react';
+import { Music, Save, Upload, MapPin, DollarSign, Instagram, Youtube, Play, Globe, ChevronDown, Link2, Video, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AnimatedButton from '@/components/shared/AnimatedButton';
 import ArtistTour from '@/components/ArtistTour';
 import { toast } from 'sonner';
+import { ImageCropDialog } from '@/components/shared/ImageCropDialog';
 
 const GENRES = ['Sertanejo', 'MPB', 'Rock', 'Pop', 'Pagode', 'Forró', 'Jazz', 'Blues', 'Eletrônica', 'Reggae', 'Samba', 'Funk', 'Outro'];
 const PERF_TYPES = ['Solo', 'Voz e Violão', 'Dupla', 'Trio', 'Banda', 'DJ'];
@@ -16,10 +18,14 @@ const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domi
 
 export default function ArtistProfileEdit({ user }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    stage_name: '', slug: '', bio: '', city: '', state: '', base_price: 0,
+    stage_name: '', slug: '', bio: '', 
+    cep: '', address: '', address_number: '', neighborhood: '', complement: '',
+    city: '', state: '', base_price: 0, phone: '',
+    pix_chave: '', pix_tipo_chave: 'aleatoria',
     genres: [], performance_types: [], available_days: [],
-    social_links: { instagram: '', youtube: '', spotify: '' },
+    social_links: { instagram: '', youtube: '', spotify: '', website: '' },
     show_formats: {},
   });
   const [expandedFormat, setExpandedFormat] = useState(null);
@@ -39,19 +45,24 @@ export default function ArtistProfileEdit({ user }) {
         stage_name: profile.stage_name || '',
         slug: profile.slug || '',
         bio: profile.bio || '',
+        cep: profile.cep || '',
+        address: profile.address || '',
+        address_number: profile.address_number || '',
+        neighborhood: profile.neighborhood || '',
+        complement: profile.complement || '',
         city: profile.city || '',
         state: profile.state || '',
         base_price: profile.base_price || 0,
+        phone: profile.phone || '',
+        pix_chave: profile.pix_chave || '',
+        pix_tipo_chave: profile.pix_tipo_chave || 'aleatoria',
         genres: profile.genres || [],
         performance_types: profile.performance_types || [],
         available_days: profile.available_days || [],
         social_links: profile.social_links || { instagram: '', youtube: '', spotify: '' },
         show_formats: profile.show_formats || {},
       });
-      // Show tour if not completed
-      if (!profile.tour_complete) {
-        setShowTour(true);
-      }
+      if (!profile.tour_complete) setShowTour(true);
     }
   }, [profile]);
 
@@ -60,6 +71,9 @@ export default function ArtistProfileEdit({ user }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artistProfile'] });
       toast.success('Perfil atualizado com sucesso! ✨');
+      setTimeout(() => {
+        navigate('/artist-dashboard');
+      }, 1500);
     },
   });
 
@@ -76,16 +90,38 @@ export default function ArtistProfileEdit({ user }) {
     }));
   };
 
-  const handleUpload = async (e, field) => {
+  const [uploadingField, setUploadingField] = useState(null);
+  const [cropDialog, setCropDialog] = useState({ open: false, image: null, field: null, aspect: 1 });
+
+  const handleUpload = (e, field) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setCropDialog({
+        open: true,
+        image: event.target.result,
+        field,
+        aspect: field === 'avatar_url' ? 1 : 2.5
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCropConfirm = async (croppedImage) => {
+    const field = cropDialog.field;
+    setUploadingField(field);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: croppedImage });
       await base44.entities.ArtistProfile.update(profile.id, { [field]: file_url });
+      setForm(prev => ({ ...prev, [field]: file_url }));
       queryClient.invalidateQueries({ queryKey: ['artistProfile'] });
-      toast.success('Imagem atualizada! 📸');
+      toast.success('Imagem ajustada e salva! 📸');
     } catch (err) {
-      toast.error('Erro ao subir imagem');
+      toast.error('Erro ao salvar imagem');
+    } finally {
+      setUploadingField(null);
     }
   };
 
@@ -107,6 +143,31 @@ export default function ArtistProfileEdit({ user }) {
   const handleSlugChange = (e) => {
     const val = slugify(e.target.value);
     setForm(prev => ({ ...prev, slug: val }));
+  };
+
+  const handleCepChange = async (e) => {
+    const cep = e.target.value.replace(/\D/g, '');
+    setForm(prev => ({ ...prev, cep }));
+
+    if (cep.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+        
+        if (!data.erro) {
+          setForm(prev => ({
+            ...prev,
+            address: data.logradouro || prev.address,
+            neighborhood: data.bairro || prev.neighborhood,
+            city: data.localidade || prev.city,
+            state: data.uf || prev.state,
+          }));
+          toast.success('Endereço preenchido automaticamente! 📍');
+        }
+      } catch (err) {
+        console.error('Erro ao buscar CEP:', err);
+      }
+    }
   };
 
   if (isLoading) return (
@@ -188,10 +249,16 @@ export default function ArtistProfileEdit({ user }) {
                   )}
                   <label className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-2">
-                      <Upload className="w-6 h-6 text-white" />
-                      <span className="text-[10px] font-black text-white uppercase tracking-widest">Alterar Foto</span>
+                      {uploadingField === 'avatar_url' ? (
+                        <Loader2 className="w-6 h-6 text-white animate-spin" />
+                      ) : (
+                        <Upload className="w-6 h-6 text-white" />
+                      )}
+                      <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                        {uploadingField === 'avatar_url' ? 'Subindo...' : 'Alterar Foto'}
+                      </span>
                     </div>
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'avatar_url')} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'avatar_url')} disabled={!!uploadingField} />
                   </label>
                 </div>
               </div>
@@ -208,10 +275,16 @@ export default function ArtistProfileEdit({ user }) {
                   )}
                   <label className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/cover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
                     <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-xl border border-white/20">
-                      <Upload className="w-5 h-5 text-white" />
-                      <span className="text-xs font-black text-white uppercase tracking-widest">Subir Banner</span>
+                      {uploadingField === 'cover_url' ? (
+                        <Loader2 className="w-5 h-5 text-white animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5 text-white" />
+                      )}
+                      <span className="text-xs font-black text-white uppercase tracking-widest">
+                        {uploadingField === 'cover_url' ? 'Subindo Banner...' : 'Subir Banner'}
+                      </span>
                     </div>
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'cover_url')} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'cover_url')} disabled={!!uploadingField} />
                   </label>
                 </div>
               </div>
@@ -256,21 +329,98 @@ export default function ArtistProfileEdit({ user }) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cidade</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">CEP</Label>
+                <Input 
+                  value={form.cep} 
+                  onChange={handleCepChange} 
+                  placeholder="00000-000" 
+                  maxLength={9}
+                  className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" 
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Endereço Completo</Label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
-                  <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="h-14 pl-12 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
+                  <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, Avenida, etc." className="h-14 pl-12 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Número</Label>
+                <Input value={form.address_number} onChange={(e) => setForm({ ...form, address_number: e.target.value })} placeholder="123" className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Bairro</Label>
+                <Input value={form.neighborhood} onChange={(e) => setForm({ ...form, neighborhood: e.target.value })} placeholder="Ex: Centro" className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cidade</Label>
+                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Estado (UF)</Label>
                 <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} maxLength={2} className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold text-center focus:ring-primary/20 uppercase" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">WhatsApp de Contato</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(00) 00000-0000" className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Complemento (Opcional)</Label>
+                <Input value={form.complement} onChange={(e) => setForm({ ...form, complement: e.target.value })} placeholder="Apto, Bloco, etc." className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Sua História / Biografia</Label>
               <Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={5} className="rounded-2xl bg-white/5 border-white/10 p-6 text-base font-medium leading-relaxed resize-none focus:ring-primary/20" placeholder="Conte um pouco sobre sua trajetória musical..." />
+            </div>
+          </motion.div>
+          
+          {/* Financial Info / PIX */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.25 }}
+            className="rounded-[2.5rem] bg-card/40 border border-white/5 backdrop-blur-xl p-8 md:p-10 shadow-2xl space-y-8"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-1 bg-emerald-400 rounded-full" />
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-400">Dados de Recebimento (PIX)</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Tipo de Chave</Label>
+                <select 
+                  value={form.pix_tipo_chave} 
+                  onChange={(e) => setForm({ ...form, pix_tipo_chave: e.target.value })}
+                  className="w-full h-14 rounded-2xl bg-white/5 border-white/10 px-4 text-base font-bold focus:ring-primary/20 appearance-none outline-none"
+                >
+                  <option value="aleatoria" className="bg-background text-foreground">Chave Aleatória</option>
+                  <option value="cpf" className="bg-background text-foreground">CPF</option>
+                  <option value="cnpj" className="bg-background text-foreground">CNPJ</option>
+                  <option value="email" className="bg-background text-foreground">E-mail</option>
+                  <option value="telefone" className="bg-background text-foreground">Telefone</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Chave PIX</Label>
+                <Input 
+                  value={form.pix_chave} 
+                  onChange={(e) => setForm({ ...form, pix_chave: e.target.value })} 
+                  placeholder="Insira sua chave PIX aqui"
+                  className="h-14 rounded-2xl bg-white/5 border-white/10 text-base font-bold focus:ring-primary/20" 
+                />
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
+              <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                <DollarSign className="w-3 h-3 text-emerald-400" />
+              </div>
+              <p className="text-[11px] text-muted-foreground font-medium leading-relaxed">
+                <strong className="text-emerald-400">Segurança TocaMais:</strong> Sua chave PIX é usada apenas para gerar os QR Codes de pagamento dos seus fãs. Os pagamentos caem direto na sua conta, sem taxas de intermediação bancária (exceto a contribuição da plataforma para planos Free).
+              </p>
             </div>
           </motion.div>
 
@@ -478,6 +628,14 @@ export default function ArtistProfileEdit({ user }) {
       </div>
     </div>
     </div>
+
+    <ImageCropDialog
+      open={cropDialog.open}
+      onOpenChange={(open) => setCropDialog(prev => ({ ...prev, open }))}
+      image={cropDialog.image}
+      aspect={cropDialog.aspect}
+      onCrop={handleCropConfirm}
+    />
     </>
   );
-}
+}

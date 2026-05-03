@@ -260,12 +260,12 @@ export default function HireProfile({ user }) {
               <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/40 to-transparent" />
               
               {/* Floating Badge Rating */}
-              {artistProfile.avg_rating && (
+              {artistProfile.avg_rating ? (
                 <div className="absolute top-6 right-6 px-4 py-2 rounded-2xl bg-black/40 backdrop-blur-md border border-white/20 flex items-center gap-2 shadow-2xl">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                   <span className="text-sm font-black text-white">{artistProfile.avg_rating.toFixed(1)}</span>
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Profile Info Section */}
@@ -366,13 +366,29 @@ export default function HireProfile({ user }) {
             })}
           </div>
 
-          {formats.length === 0 && (
-            <div className="text-center py-24 bg-white/[0.02] rounded-[3.5rem] border border-dashed border-white/5 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <Music className="w-20 h-20 text-muted-foreground/10 mx-auto mb-6" />
-              <p className="text-muted-foreground font-black uppercase tracking-widest text-sm opacity-60">Este artista ainda não cadastrou formatos de show.</p>
+          {formats.length === 0 ? (
+            <div className="text-center py-24 bg-white/[0.02] rounded-[3.5rem] border-2 border-dashed border-white/5 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="relative z-10 space-y-6">
+                <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mx-auto border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                  <Sparkles className="w-10 h-10 text-primary/40 group-hover:text-primary transition-colors" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black uppercase tracking-widest text-foreground">Palco em Preparação</h3>
+                  <p className="text-muted-foreground font-medium max-w-xs mx-auto leading-relaxed">
+                    Este artista ainda não configurou os formatos de show. Volte em breve para contratar!
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/marketplace')}
+                  className="h-12 px-6 rounded-xl font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
+                >
+                  Ver Outros Artistas
+                </Button>
+              </div>
             </div>
-          )}
+          ) : null}
         </motion.div>
 
         {/* Professionalism info */}
@@ -394,7 +410,7 @@ export default function HireProfile({ user }) {
         </motion.div>
 
         {/* Social links */}
-        {(artistProfile.social_links?.instagram || artistProfile.social_links?.youtube || artistProfile.social_links?.spotify) && (
+        {(artistProfile.social_links?.instagram || artistProfile.social_links?.youtube || artistProfile.social_links?.spotify) ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -423,7 +439,7 @@ export default function HireProfile({ user }) {
               )}
             </div>
           </motion.div>
-        )}
+        ) : null}
       </div>
     </div>
   );

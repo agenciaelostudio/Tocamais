@@ -38,7 +38,6 @@ const navByRole = {
     { label: 'Gorjetas', icon: DollarSign, path: '/tips' },
     { label: 'Contrate', icon: Music, path: '/marketplace' },
     { label: 'Chat', icon: MessageSquare, path: '/chat' },
-    { label: 'Meu Perfil', icon: Mic2, path: '/artist-profile' },
   ],
   fan: [
     { label: 'Explorar', icon: Search, path: '/explore' },
@@ -106,7 +105,12 @@ export default function Sidebar({ userRole, user, mobileOpen, setMobileOpen }) {
 
       <div className="p-6 space-y-4">
         {/* Premium Badge */}
-        <div className="rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 p-4 border border-white/5 backdrop-blur-xl group cursor-pointer hover:scale-[1.02] transition-all">
+        <div 
+          onClick={() => toast.success('TocaMais Pro em breve! 🚀 Estamos preparando recursos exclusivos para você.', {
+            description: 'Novas ferramentas de marketing, analytics e muito mais.'
+          })}
+          className="rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 p-4 border border-white/5 backdrop-blur-xl group cursor-pointer hover:scale-[1.02] active:scale-95 transition-all"
+        >
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
               <Zap size={14} className="text-primary animate-pulse" />
@@ -117,14 +121,6 @@ export default function Sidebar({ userRole, user, mobileOpen, setMobileOpen }) {
         </div>
 
         <div className="pt-4 border-t border-white/5 space-y-1">
-          <Link
-            to="/settings"
-            onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
-          >
-            <Settings size={18} />
-            <span>Configurações</span>
-          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all"

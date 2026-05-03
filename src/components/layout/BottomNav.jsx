@@ -26,7 +26,6 @@ const navByRole = {
     { label: 'Propostas', icon: Send, path: '/proposals' },
     { label: 'Agenda', icon: Calendar, path: '/events' },
     { label: 'Gorjetas', icon: DollarSign, path: '/tips' },
-    { label: 'Perfil', icon: Mic2, path: '/artist-profile' },
   ],
   fan: [
     { label: 'Explorar', icon: Search, path: '/explore' },
@@ -109,16 +108,6 @@ export function BottomNav({ userRole, badges = {}, onMenuClick, contextAction })
               </span>
             </button>
           )}
-
-          <button
-            onClick={onMenuClick}
-            className="relative flex flex-col items-center justify-center flex-1 py-1.5 rounded-xl transition-all duration-300 group text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
-          >
-            <Menu className="w-5 h-5 transition-all duration-300" strokeWidth={1.8} />
-            <span className="text-[10px] mt-0.5 transition-all duration-300 truncate w-full px-1 text-center font-normal">
-              Menu
-            </span>
-          </button>
         </div>
       </nav>
     </div>

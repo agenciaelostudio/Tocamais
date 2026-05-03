@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/integrations/supabase/client';
-import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock, AlertCircle, CheckCircle2, QrCode } from 'lucide-react';
+import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock, AlertCircle, CheckCircle2, QrCode, Plus, Loader2 } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -74,7 +74,7 @@ export default function ArtistDashboard({ user }) {
     queryFn: () => base44.entities.Event.filter({ artist_email: user.email }, '-event_date', 20),
   });
 
-  const totalTips = gorjetas.reduce((sum, g) => sum + (g.valor_liquido_artista || 0), 0);
+  const totalNetTips = gorjetas.reduce((sum, g) => sum + (Number(g.valor_liquido_artista) || 0), 0);
   const pendingProposals = proposals.filter((p) => p.status === 'pending');
 
   const handleConfirmarRecebimento = async (pedidoId) => {
@@ -183,10 +183,84 @@ export default function ArtistDashboard({ user }) {
           </TabsContent>
 
           <TabsContent value="overview" className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 outline-none">
+            {/* Quick Resolution List: Pending PIX */}
+            {pedidosAguardando.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-400/10 flex items-center justify-center border border-amber-400/20">
+                      <AlertCircle className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <h2 className="font-heading font-black text-2xl tracking-tight">PIX para <span className="text-amber-400 underline decoration-amber-400/30">Confirmar</span></h2>
+                  </div>
+                  <TabsList className="bg-white/5 border border-white/5 h-10 px-4 rounded-xl">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400/60 animate-pulse">Confira seu banco antes de clicar</span>
+                  </TabsList>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pedidosAguardando.slice(0, 3).map((pedido) => (
+                    <motion.div
+                      key={pedido.id}
+                      layoutId={pedido.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="group relative overflow-hidden p-6 rounded-[2rem] bg-amber-400/5 border-2 border-amber-400/20 hover:border-amber-400/40 transition-all shadow-xl shadow-amber-400/5"
+                    >
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-2xl bg-amber-400/20 flex items-center justify-center text-amber-400 font-black text-xl border border-amber-400/30 shadow-inner group-hover:scale-110 transition-transform">
+                          {pedido.cliente_nome?.[0] || 'F'}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-black text-lg text-white truncate">{pedido.cliente_nome || 'Fã Anônimo'}</p>
+                          <p className="text-2xl font-black text-amber-400 tracking-tighter">
+                            R$ {pedido.valor ? Number(pedido.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '0,00'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1 mb-6 bg-white/[0.03] p-3 rounded-xl border border-white/5">
+                         <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 flex items-center gap-1.5">
+                            <Music className="w-3 h-3" /> Pedido de Música
+                         </p>
+                         <p className="text-sm font-bold text-white/90 truncate">{pedido.musica || 'Apenas gorjeta'}</p>
+                      </div>
+
+                      <Button
+                        onClick={() => handleConfirmarRecebimento(pedido.id)}
+                        disabled={confirmingId === pedido.id}
+                        className="w-full h-14 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-base shadow-lg shadow-amber-400/20 active:scale-95 transition-all"
+                      >
+                        {confirmingId === pedido.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <span className="flex items-center gap-2">CONFIRMAR RECEBIMENTO <CheckCircle2 className="w-5 h-5" /></span>
+                        )}
+                      </Button>
+                    </motion.div>
+                  ))}
+                  {pedidosAguardando.length > 3 && (
+                    <button 
+                      onClick={() => {
+                        const trigger = document.querySelector('[value="aguardando"]');
+                        if (trigger) trigger.click();
+                      }}
+                      className="h-full min-h-[150px] rounded-[2rem] border-2 border-dashed border-white/10 hover:border-amber-400/30 hover:bg-amber-400/5 transition-all flex flex-col items-center justify-center gap-3 text-muted-foreground hover:text-amber-400 group"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400/10 transition-colors">
+                        <Plus className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-widest">Ver mais {pedidosAguardando.length - 3} pedidos</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               <StatsCard icon={Send} label="Propostas Pendentes" value={pendingProposals.length} color="primary" delay={0.1} trend="+1 nova hoje" />
-              <StatsCard icon={DollarSign} label="Total em Gorjetas" value={`R$ ${totalTips.toLocaleString('pt-BR')}`} color="secondary" delay={0.15} trend="Recorde este mês!" />
+              <StatsCard icon={DollarSign} label="Total em Gorjetas" value={`R$ ${totalNetTips.toLocaleString('pt-BR')}`} color="secondary" delay={0.15} trend="Recorde este mês!" />
               <StatsCard icon={Calendar} label="Próximos Shows" value={events.filter((e) => e.status === 'scheduled').length} color="yellow" delay={0.2} trend="Agenda lotada" />
               <StatsCard icon={Star} label="Avaliação Média" value={profile?.avg_rating?.toFixed(1) || '4.9'} color="pink" delay={0.25} trend="Nível Ouro" />
             </div>
@@ -449,7 +523,7 @@ export default function ArtistDashboard({ user }) {
                 </div>
                 <div className="bg-emerald-500/10 border border-emerald-500/20 px-8 py-6 rounded-[2rem] shadow-xl">
                   <p className="text-[10px] uppercase font-black text-emerald-400 tracking-[0.2em] mb-2">Saldo em Gorjetas</p>
-                  <p className="text-3xl font-black text-emerald-500 font-heading tracking-tighter">R$ {totalTips.toLocaleString('pt-BR')}</p>
+                  <p className="text-3xl font-black text-emerald-500 font-heading tracking-tighter">R$ {totalNetTips.toLocaleString('pt-BR')}</p>
                 </div>
               </div>
               <TipsSummary tips={gorjetas} />

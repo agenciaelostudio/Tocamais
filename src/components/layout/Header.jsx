@@ -2,6 +2,7 @@ import React from 'react';
 import NotificationBell from '@/components/shared/NotificationBell';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Header({ user, onMenuClick }) {
   return (
@@ -22,12 +23,14 @@ export default function Header({ user, onMenuClick }) {
       <div className="flex items-center gap-3">
         <NotificationBell user={user} />
         <div className="h-8 w-px bg-border/50 mx-1" />
-        <Avatar className="h-9 w-9 ring-2 ring-primary/20 cursor-pointer hover:ring-primary/40 transition-all">
-          <AvatarImage src={user?.avatar_url} />
-          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-            {user?.full_name?.[0]}
-          </AvatarFallback>
-        </Avatar>
+        <Link to={user?.role === 'artist' ? '/artist-profile' : user?.role === 'bar_owner' ? '/venue' : '/settings'}>
+          <Avatar className="h-9 w-9 ring-2 ring-primary/20 cursor-pointer hover:ring-primary/40 active:scale-90 transition-all">
+            <AvatarImage src={user?.avatar_url} />
+            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+              {user?.full_name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
       </div>
     </header>
   );

@@ -15,25 +15,26 @@ const data = [
 ];
 
 export default function TipsSummary({ tips = [] }) {
-  const totalTips = tips.reduce((sum, t) => sum + (t.amount || 0), 0);
+  const totalGross = tips.reduce((sum, t) => sum + (Number(t.valor) || 0), 0);
+  const totalNet = tips.reduce((sum, t) => sum + (Number(t.valor_liquido_artista) || 0), 0);
   
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="bg-white/[0.03] border-white/5 shadow-2xl backdrop-blur-xl rounded-[2rem] overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/10 blur-3xl rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-1000" />
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Recebido</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Arrecadado</CardTitle>
               <div className="p-2 bg-secondary/10 rounded-lg">
                 <DollarSign className="h-4 w-4 text-secondary" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black font-heading text-white tracking-tight">R$ {totalTips.toLocaleString('pt-BR')}</div>
+              <div className="text-3xl font-black font-heading text-white tracking-tight">R$ {totalGross.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
               <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-1.5 mt-3">
                 <TrendingUp size={12} className="animate-pulse" />
-                Crescimento de 15%
+                Valor Bruto (Fãs)
               </p>
             </CardContent>
           </Card>
@@ -41,18 +42,38 @@ export default function TipsSummary({ tips = [] }) {
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="bg-white/[0.03] border-white/5 shadow-2xl backdrop-blur-xl rounded-[2rem] overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-3xl rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-1000" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 blur-3xl rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-1000" />
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Saldo Direto</CardTitle>
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <ShieldCheck className="h-4 w-4 text-primary" />
+              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Líquido para Você</CardTitle>
+              <div className="p-2 bg-emerald-500/10 rounded-lg">
+                <Wallet className="h-4 w-4 text-emerald-400" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black font-heading text-white tracking-tight">R$ {totalTips.toLocaleString('pt-BR')}</div>
+              <div className="text-3xl font-black font-heading text-white tracking-tight">R$ {totalNet.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-3 opacity-60">
-                100% para o artista • Taxa Zero
+                Seu saldo real após split
               </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="bg-emerald-500/10 border-emerald-500/20 shadow-2xl backdrop-blur-xl rounded-[2rem] overflow-hidden relative group md:col-span-2 lg:col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Disponível para Saque</CardTitle>
+              <Zap className="h-4 w-4 text-yellow-400" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-3xl font-black font-heading text-white tracking-tight">R$ {totalNet.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+              <button 
+                className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50 disabled:grayscale"
+                disabled={totalNet < 20}
+                onClick={() => toast.info('Solicitação de saque enviada para processamento! 💸')}
+              >
+                Solicitar Saque PIX
+              </button>
+              <p className="text-[9px] text-center text-muted-foreground font-bold uppercase tracking-widest opacity-50">Mínimo para saque: R$ 20,00</p>
             </CardContent>
           </Card>
         </motion.div>

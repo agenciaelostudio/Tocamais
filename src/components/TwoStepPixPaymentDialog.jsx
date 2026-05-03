@@ -22,6 +22,7 @@ export function TwoStepPixPaymentDialog({
   onOpenChange,
   artistaId,
   artistaNome,
+  artistaEmail,
   pixChave,
   pixTipoChave,
   isPro,
@@ -31,6 +32,8 @@ export function TwoStepPixPaymentDialog({
   estabelecimentoId,
   initialMusica,
   initialClienteNome,
+  initialMensagem,
+  initialValor,
   onSuccess,
 }) {
   const [step, setStep] = useState('pedido'); // 'pedido', 'pagamento', 'sucesso'
@@ -51,8 +54,18 @@ export function TwoStepPixPaymentDialog({
     if (open) {
       setPedidoMusica(initialMusica || "");
       setClienteNome(initialClienteNome || "");
+      setPedidoMensagem(initialMensagem || "");
+      setValorGorjeta(initialValor ? initialValor.toFixed(2).replace('.', ',') : "5,00");
       setMusicaCustomizada(false);
-      setValorGorjeta("5,00");
+      
+      // If we already have the main info, skip directly to payment step
+      if (initialMusica && initialClienteNome) {
+        setStep('pagamento');
+        // Auto-create order record if it doesn't exist
+        if (!pedidoId && !creatingPedido) {
+          handleCriarPedido();
+        }
+      }
     } else {
       setTimeout(() => {
         setStep('pedido');
@@ -65,7 +78,7 @@ export function TwoStepPixPaymentDialog({
         setDynamicQrCode(null);
       }, 500);
     }
-  }, [open, initialMusica]);
+  }, [open, initialMusica, initialClienteNome, initialMensagem, initialValor]);
 
   const formatCurrency = (value) => {
     const numericValue = value.replace(/\D/g, '');
@@ -185,6 +198,17 @@ export function TwoStepPixPaymentDialog({
         console.error("Error inserting pedido:", error);
       }
 
+      // Notify artist about new order (waiting PIX)
+      if (artistaEmail) {
+        await supabase.from('notifications').insert({
+          user_email: artistaEmail,
+          type: 'tip',
+          title: 'Novo Pedido (Aguardando PIX)',
+          message: `${clienteNome.trim()} pediu "${pedidoMusica.trim() || 'Gorjeta'}"`,
+          is_read: false
+        });
+      }
+
       setPedidoId(newPedidoId);
       setStep('pagamento');
     } catch (error) {
@@ -221,6 +245,17 @@ export function TwoStepPixPaymentDialog({
         else if (data.error === 'SEM_PERMISSAO') toast.error('Sessão inválida. Tente recarregar a página.');
         else toast.error('Não foi possível registrar o PIX. Tente novamente.');
         return;
+      }
+
+      // Notify artist that PIX was declared
+      if (artistaEmail) {
+        await supabase.from('notifications').insert({
+          user_email: artistaEmail,
+          type: 'tip',
+          title: 'PIX Declarado! 💰',
+          message: `${clienteNome.trim()} declarou o pagamento de R$ ${valor.toFixed(2)}`,
+          is_read: false
+        });
       }
 
       setStep('sucesso');
@@ -421,11 +456,6 @@ export function TwoStepPixPaymentDialog({
                     <p className="text-muted-foreground font-medium text-sm">
                       Sua gorjeta é o melhor aplauso para <span className="text-emerald-400 font-bold">{artistaNome}</span>
                     </p>
-                    {!isPro && (
-                      <p className="text-[10px] text-primary font-black uppercase tracking-widest bg-primary/10 py-1 px-3 rounded-full inline-block border border-primary/20">
-                        Contribuição Plataforma Tocamais (Taxa 30%)
-                      </p>
-                    )}
                   </div>
                 </div>
 

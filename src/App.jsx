@@ -26,6 +26,7 @@ import Notifications from '@/pages/Notifications';
 import Settings from '@/pages/Settings';
 import QueuePage from '@/pages/Queue';
 import Contratacao from '@/pages/Contratacao';
+import OrderPage from '@/pages/OrderPage';
 
 const LoadingScreen = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-background">
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
 
   const isPublicRoute = 
     location.pathname.startsWith('/artist/') || 
+    location.pathname.startsWith('/pedido/') ||
     publicPaths.includes(location.pathname) ||
     (!privatePaths.filter(p => p !== '/').some(path => location.pathname.startsWith(path)) && location.pathname !== '/');
 
@@ -75,6 +77,7 @@ const AuthenticatedApp = () => {
       <Route element={<AppLayout userRole={userRole} user={user} />}>
         {/* Public Routes accessible to everyone */}
         <Route path="/artist/:id" element={<ArtistPublicProfile user={user} />} />
+        <Route path="/pedido/:artistId" element={<OrderPage user={user} />} />
         <Route path="/queue" element={<QueuePage />} />
         <Route path="/explore" element={<Explore user={user} />} />
 

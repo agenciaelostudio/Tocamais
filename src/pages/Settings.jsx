@@ -47,15 +47,53 @@ export default function Settings({ user }) {
           </div>
         </div>
 
-        <div><Label>Telefone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-        <div className="grid grid-cols-2 gap-4">
-          <div><Label>Cidade</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
-          <div><Label>Estado</Label><Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} /></div>
-        </div>
+        {user?.role === 'artist' ? (
+          <div className="space-y-6">
+             <div className="p-6 rounded-[2rem] bg-primary/5 border border-primary/10 flex flex-col items-center text-center gap-4 group hover:bg-primary/10 transition-all duration-500">
+                <div className="w-16 h-16 rounded-[1.25rem] bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                   <User className="w-8 h-8" />
+                </div>
+                <div className="space-y-1">
+                   <p className="font-heading font-black text-xl">Perfil Artístico Ativo</p>
+                   <p className="text-sm text-muted-foreground font-medium leading-relaxed">Sua localização detalhada e biografia são gerenciadas diretamente no seu perfil público para atrair contratantes.</p>
+                </div>
+                <AnimatedButton 
+                  onClick={() => window.location.href = '/artist-profile'} 
+                  className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20"
+                >
+                  EDITAR MEU PALCO
+                </AnimatedButton>
+             </div>
+             
+             <div className="pt-4 border-t border-border/50">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">WhatsApp de Contato</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(00) 00000-0000" className="h-14 rounded-2xl bg-white/5 border-white/10" />
+             </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Telefone</Label>
+              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-14 rounded-2xl bg-white/5 border-white/10" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cidade</Label>
+                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="h-14 rounded-2xl bg-white/5 border-white/10" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Estado</Label>
+                <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} className="h-14 rounded-2xl bg-white/5 border-white/10" />
+              </div>
+            </div>
+          </div>
+        )}
 
-        <AnimatedButton onClick={handleSave} disabled={saving} className="w-full bg-gradient-to-r from-primary to-secondary text-white border-0">
-          <Save size={16} className="mr-2" /> {saving ? 'Salvando...' : 'Salvar'}
-        </AnimatedButton>
+        <div className="pt-4">
+          <AnimatedButton onClick={handleSave} disabled={saving} className="w-full h-16 rounded-[1.5rem] bg-foreground text-background hover:bg-foreground/90 font-black text-lg transition-all active:scale-95 shadow-2xl">
+            {saving ? 'SINCRONIZANDO...' : <><Save size={20} className="mr-3" /> SALVAR CONFIGURAÇÕES</>}
+          </AnimatedButton>
+        </div>
       </motion.div>
     </div>
   );
