@@ -94,7 +94,7 @@ const ArtistPublicProfile = ({ user }) => {
 
   const { isPro } = useSubscription(id || null);
   const isMobile = useIsMobile();
-  const [artistLimitReached, setArtistLimitReached] = useState(false);
+
 
   useEffect(() => {
     fetchArtist();

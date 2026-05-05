@@ -81,7 +81,7 @@ export default function ArtistDashboard({ user }) {
     if (!profile?.id) return;
     setConfirmingId(pedidoId);
     try {
-      const { data, error } = await supabase.rpc('confirm_pix_receipt', {
+      const { data, error } = await supabase.rpc('confirm_pix_with_limit_check', {
         p_pedido_id: pedidoId,
         p_artista_id: profile.id,
       });

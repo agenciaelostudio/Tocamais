@@ -1,9 +1,17 @@
 {
   "short_name": "TocaMais",
-  "name": "TocaMais - Gestão para Músicos",
-  "icons": [],
-  "start_url": ".",
+  "name": "TocaMais - Palco Virtual",
+  "description": "Gorjetas e pedidos de música em tempo real.",
+  "icons": [
+    {
+      "src": "TocaMais App - Google.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#000000"
 }
