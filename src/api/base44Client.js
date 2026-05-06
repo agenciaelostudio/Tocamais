@@ -545,6 +545,22 @@ export const base44 = {
       }
     },
 
+    async resetPasswordForEmail(email) {
+      if (!isSupabaseConfigured) {
+        const db = getLocalDB();
+        const user = db.users?.find(u => u.email === email);
+        if (!user) throw new Error('Usuario nao encontrado (Local Mock).');
+        return { data: {}, error: null };
+      }
+
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      return data;
+    },
+
     redirectToLogin() {
       if (typeof window !== 'undefined') window.location.assign('/');
     },

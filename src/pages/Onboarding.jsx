@@ -58,6 +58,8 @@ export default function Onboarding({ user, onComplete, authError }) {
   });
   const [loading, setLoading] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -171,6 +173,25 @@ export default function Onboarding({ user, onComplete, authError }) {
 
       setLoginErrorMessage(message);
       toast.error(error.message || 'Nao foi possivel entrar.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!resetEmail) {
+      toast.error('Informe seu email para recuperar a senha.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await base44.auth.resetPasswordForEmail(resetEmail);
+      toast.success('Email de recuperacao enviado! Verifique sua caixa de entrada.');
+      setShowForgotPassword(false);
+      setResetEmail('');
+    } catch (error) {
+      toast.error(error.message || 'Nao foi possivel enviar o email de recuperacao.');
     } finally {
       setLoading(false);
     }
@@ -316,6 +337,16 @@ export default function Onboarding({ user, onComplete, authError }) {
                 </div>
               </div>
               
+              <div className="flex justify-end px-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm font-bold text-primary hover:text-primary/80 transition-colors"
+                >
+                  Esqueci minha senha
+                </button>
+              </div>
+
               <div className="flex flex-col gap-4 pt-4">
                 <AnimatedButton
                   onClick={handleGuestLogin}
@@ -483,6 +514,57 @@ export default function Onboarding({ user, onComplete, authError }) {
                 </motion.div>
               )}
             </>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showForgotPassword && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="w-full max-w-md bg-card border border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative"
+              >
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-black tracking-tight mb-2">RECUPERAR ACESSO</h3>
+                  <p className="text-muted-foreground text-sm font-medium">
+                    Enviaremos um link para voce criar uma nova senha.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-black uppercase tracking-widest text-primary ml-2">Seu Email</Label>
+                    <Input
+                      type="email"
+                      placeholder="voce@tocamais.app"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-lg font-medium px-6"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <AnimatedButton
+                      onClick={handleForgotPassword}
+                      disabled={loading}
+                      className="h-16 rounded-2xl bg-primary text-primary-foreground font-black text-lg tracking-tight"
+                    >
+                      {loading ? 'ENVIANDO...' : 'ENVIAR LINK'}
+                    </AnimatedButton>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowForgotPassword(false)}
+                      disabled={loading}
+                      className="h-14 rounded-2xl font-bold"
+                    >
+                      Voltar para login
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </motion.div>

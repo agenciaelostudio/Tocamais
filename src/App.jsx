@@ -27,6 +27,7 @@ import Settings from '@/pages/Settings';
 import QueuePage from '@/pages/Queue';
 import Contratacao from '@/pages/Contratacao';
 import OrderPage from '@/pages/OrderPage';
+import ResetPassword from '@/pages/ResetPassword';
 
 const LoadingScreen = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-background">
@@ -42,7 +43,7 @@ const AuthenticatedApp = () => {
   const location = useLocation();
 
   // Define routes that can be accessed without authentication
-  const publicPaths = ['/queue', '/explore'];
+  const publicPaths = ['/queue', '/explore', '/reset-password'];
   const privatePaths = [
     '/dashboard', '/contratar', '/proposals', '/events', '/tips', 
     '/favorites', '/artist-profile', '/venue', '/chat', 
@@ -80,6 +81,7 @@ const AuthenticatedApp = () => {
         <Route path="/pedido/:artistId" element={<OrderPage user={user} />} />
         <Route path="/queue" element={<QueuePage />} />
         <Route path="/explore" element={<Explore user={user} />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Private Routes requiring authentication */}
         <Route path="/" element={user ? <Dashboard user={user} /> : <Navigate to="/explore" />} />
