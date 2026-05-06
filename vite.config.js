@@ -12,6 +12,7 @@ const CNAME_RECORDS = ['www.tocamais.app'] // Aponta para o domínio principal
 const DOMAINS = [
   ...A_RECORDS,
   ...CNAME_RECORDS,
+  '187.127.251.137',
   'localhost',
   '0.0.0.0'
 ]
@@ -20,7 +21,7 @@ const DOMAINS = [
 export default defineConfig({
   logLevel: 'error',
   server: {
-    host: '',
+    host: '0.0.0.0',
     port,
     strictPort: true,
     allowedHosts: DOMAINS,
