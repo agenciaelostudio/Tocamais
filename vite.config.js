@@ -24,13 +24,13 @@ export default defineConfig({
     host: '0.0.0.0',
     port,
     strictPort: true,
-    allowedHosts: DOMAINS,
+    allowedHosts: true,
   },
   preview: {
     host: '0.0.0.0',
     port,
     strictPort: true,
-    allowedHosts: DOMAINS,
+    allowedHosts: true,
   },
   resolve: {
     alias: {
