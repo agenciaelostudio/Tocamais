@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Home, Music } from 'lucide-react';
 import AnimatedButton from '@/components/shared/AnimatedButton';
 import GlowOrb from '@/components/shared/GlowOrb';
+import Logo from '@/components/shared/Logo';
 
 export default function PageNotFound() {
   return (
@@ -16,8 +17,8 @@ export default function PageNotFound() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center relative z-10 px-4"
       >
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-6">
-          <Music className="w-10 h-10 text-white" />
+        <div className="mx-auto mb-6 flex justify-center">
+          <Logo size="2xl" />
         </div>
         <h1 className="text-6xl font-heading font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
           404

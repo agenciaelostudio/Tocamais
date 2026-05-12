@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Heart, Music, Trophy } from 'lucide-react';
+import { X, Sparkles, Heart, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function GuestWelcomeBanner({ open, onOpenChange }) {

@@ -10,6 +10,7 @@ import AppLayout from '@/components/layout/AppLayout';
 
 import Onboarding from '@/pages/Onboarding';
 import Dashboard from '@/pages/Dashboard';
+import Landing from '@/pages/Landing';
 import Explore from '@/pages/Explore';
 import ArtistPublicProfile from '@/pages/ArtistPublicProfile';
 import Proposals from '@/pages/Proposals';
@@ -43,7 +44,7 @@ const AuthenticatedApp = () => {
   const location = useLocation();
 
   // Define routes that can be accessed without authentication
-  const publicPaths = ['/queue', '/explore', '/reset-password'];
+  const publicPaths = ['/queue', '/explore', '/reset-password', '/landing'];
   const privatePaths = [
     '/dashboard', '/contratar', '/proposals', '/events', '/tips', 
     '/favorites', '/artist-profile', '/venue', '/chat', 
@@ -59,6 +60,11 @@ const AuthenticatedApp = () => {
 
   if (isLoadingAuth) {
     return <LoadingScreen />;
+  }
+
+  // If unauthenticated and hitting the root, redirect to the new landing page
+  if (!user && location.pathname === '/') {
+    return <Navigate to="/landing" replace />;
   }
 
   // If not logged in and not a public route, redirect to onboarding/login
@@ -82,10 +88,11 @@ const AuthenticatedApp = () => {
         <Route path="/queue" element={<QueuePage />} />
         <Route path="/explore" element={<Explore user={user} />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/landing" element={<Landing />} />
 
         {/* Private Routes requiring authentication */}
-        <Route path="/" element={user ? <Dashboard user={user} /> : <Navigate to="/explore" />} />
-        <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/explore" />} />
+        <Route path="/" element={user ? <Dashboard user={user} /> : <Navigate to="/landing" />} />
+        <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/landing" />} />
         <Route path="/contratar/:artistaId" element={user ? <Contratacao user={user} /> : <Navigate to="/onboarding" />} />
         <Route path="/proposals" element={user ? <Proposals user={user} /> : <Navigate to="/onboarding" />} />
         <Route path="/events" element={user ? <Events user={user} /> : <Navigate to="/onboarding" />} />

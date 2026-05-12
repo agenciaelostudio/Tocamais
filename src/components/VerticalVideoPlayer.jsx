@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Play, ExternalLink, Instagram, Youtube, Loader2, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function extractVideoInfo(url) {

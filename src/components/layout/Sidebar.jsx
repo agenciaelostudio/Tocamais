@@ -12,11 +12,9 @@ import {
   Search,
   Send,
   Store,
-  Settings,
   LogOut,
   X,
   Zap,
-  Mic2,
 } from 'lucide-react';
 import Logo from '@/components/shared/Logo';
 import { base44 } from '@/api/base44Client';

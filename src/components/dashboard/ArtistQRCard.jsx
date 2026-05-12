@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
-import { motion } from 'framer-motion';
 import { Download, QrCode, Share2, Music, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';

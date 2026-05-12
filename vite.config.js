@@ -1,6 +1,5 @@
 import path from 'node:path'
 import react from '@vitejs/plugin-react'
-import base44 from '@base44/vite-plugin'
 import { defineConfig } from 'vite'
 
 const port = Number(process.env.PORT || 5173)
@@ -39,6 +38,5 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    base44(),
   ]
 });

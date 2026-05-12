@@ -40,19 +40,6 @@ export default function AppLayout({ userRole, user }) {
         />
       )}
       
-      {isGuest && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-           <div className="px-6 py-3 rounded-2xl bg-primary/10 backdrop-blur-xl border border-primary/20 flex items-center gap-4 shadow-2xl">
-              <p className="text-xs font-black uppercase tracking-widest text-primary whitespace-nowrap">Curtiu o show? Faça parte!</p>
-              <button 
-                onClick={() => window.location.href = '/onboarding'}
-                className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary/20"
-              >
-                Cadastrar
-              </button>
-           </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Music, Star, Filter, ChevronRight, Users, User, Mic2, LayoutGrid, MapPin } from 'lucide-react';
+import { Music, Star, Filter, ChevronRight, Users, User, Mic2, LayoutGrid, MapPin } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';

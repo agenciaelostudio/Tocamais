@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Lock, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AnimatedButton from '@/components/shared/AnimatedButton';

@@ -8,9 +8,7 @@ import {
   DollarSign, 
   Heart, 
   Star,
-  Bell,
-  Menu,
-  Mic2
+  Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

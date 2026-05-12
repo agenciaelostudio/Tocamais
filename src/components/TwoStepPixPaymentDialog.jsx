@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MusicCombobox } from "@/components/MusicCombobox";
 import { 
-  Copy, Check, QrCode, Clock, Loader2, ArrowLeft, ArrowRight, 
+  Copy, Check, Loader2, ArrowLeft, ArrowRight, 
   CheckCircle2, Music, Sparkles, Heart, ShieldCheck, Zap,
-  PartyPopper, Wallet, Info
+  PartyPopper, Info
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

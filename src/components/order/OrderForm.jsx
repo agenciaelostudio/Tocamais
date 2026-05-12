@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Sparkles, Music2, Heart, ArrowRight, X } from "lucide-react";
+import { Sparkles, Music2, Heart, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -67,7 +67,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
       <div className="p-8 pb-2 flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">
-            Fazer <span className="text-primary">Pedido</span>
+            Fazer <span className="text-emerald-400">Pedido</span>
           </h2>
           <p className="text-xs text-muted-foreground uppercase tracking-widest opacity-60">Para: <span className="text-white font-bold">{artistName}</span></p>
         </div>
@@ -76,8 +76,8 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
             <div 
               key={s} 
               className={`h-1.5 rounded-full transition-all duration-500 ${
-                step === s ? "w-8 bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.8)]" : 
-                step > s ? "w-4 bg-primary/40" : "w-4 bg-white/10"
+                step === s ? "w-8 bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]" : 
+                step > s ? "w-4 bg-emerald-500/40" : "w-4 bg-white/10"
               }`} 
             />
           ))}
@@ -96,7 +96,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
             >
               <div className="space-y-4">
                 <Label className="text-sm font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
-                  <Music2 className="h-4 w-4 text-primary" />
+                  <Music2 className="h-4 w-4 text-emerald-400" />
                   Passo 1: Qual música?
                 </Label>
                 <SongSelector 
@@ -112,7 +112,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                   placeholder="Como o artista deve te chamar?"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="bg-white/5 border-white/10 h-14 rounded-2xl text-lg font-bold focus:ring-primary/20"
+                  className="bg-white/5 border-white/10 h-14 rounded-2xl text-lg font-bold focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -120,7 +120,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                 <div className="space-y-3 pt-4 border-t border-white/5">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-white/30">Música Personalizada (Fora do Setlist)</Label>
                   <div className="relative group">
-                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary animate-pulse" />
+                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-400 animate-pulse" />
                     <Input 
                       placeholder="Nome da música e artista..."
                       value={customSong}
@@ -128,7 +128,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                         setCustomSong(e.target.value);
                         setSelectedSong(null);
                       }}
-                      className="pl-12 bg-white/5 border-white/10 h-16 rounded-2xl text-lg font-bold focus:ring-primary/20"
+                      className="pl-12 bg-white/5 border-white/10 h-16 rounded-2xl text-lg font-bold focus:ring-emerald-500/20"
                     />
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                 onClick={() => setStep(2)}
                 disabled={!canProceedStep1}
                 className={`w-full h-16 rounded-[1.5rem] text-lg font-black uppercase tracking-widest shadow-2xl transition-all duration-300 ${
-                  canProceedStep1 ? "bg-primary text-white scale-[1.02]" : "bg-white/5 text-white/20"
+                  canProceedStep1 ? "bg-emerald-500 hover:bg-emerald-400 text-black scale-[1.02]" : "bg-white/5 text-white/20"
                 }`}
               >
                 Próximo Passo
@@ -163,7 +163,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
             >
               <div className="space-y-4">
                 <Label className="text-sm font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-primary" />
+                  <Heart className="h-4 w-4 text-emerald-400" />
                   Passo 2: Apoio ao Artista
                 </Label>
                 <p className="text-xs text-muted-foreground font-medium">Sua gorjeta incentiva o músico e libera mensagens personalizadas.</p>
@@ -181,7 +181,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                     placeholder="Escreva algo especial para o artista ou para quem você dedica essa música..."
                     value={dedication}
                     onChange={(e) => setDedication(e.target.value)}
-                    className="bg-white/5 border-white/10 min-h-[100px] rounded-xl resize-none focus:ring-primary/20"
+                    className="bg-white/5 border-white/10 min-h-[100px] rounded-xl resize-none focus:ring-emerald-500/20"
                     maxLength={200}
                   />
                   <p className="text-[10px] text-right text-muted-foreground">{dedication.length}/200</p>
@@ -195,7 +195,7 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                 <Button 
                   onClick={() => setStep(3)}
                   disabled={donationAmount > 0 && donationAmount < 2}
-                  className="h-14 flex-[2] rounded-2xl text-lg font-bold shadow-xl"
+                  className="h-14 flex-[2] rounded-2xl text-lg font-bold shadow-xl bg-emerald-500 hover:bg-emerald-400 text-black"
                 >
                   Ver Resumo
                 </Button>
@@ -210,11 +210,11 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
               animate={{ opacity: 1, scale: 1 }}
               className="space-y-6"
             >
-              <div className="p-6 rounded-3xl bg-primary/10 border border-primary/20 relative overflow-hidden group">
-                <div className="absolute -right-4 -top-4 h-24 w-24 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-colors" />
+              <div className="p-6 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 relative overflow-hidden group">
+                <div className="absolute -right-4 -top-4 h-24 w-24 bg-emerald-500/20 rounded-full blur-3xl group-hover:bg-emerald-500/30 transition-colors" />
                 <div className="relative z-10 space-y-4">
                   <div>
-                    <p className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">Música Selecionada</p>
+                    <p className="text-[10px] text-emerald-400 uppercase tracking-[0.2em] font-bold mb-1">Música Selecionada</p>
                     <h3 className="text-xl font-bold text-white leading-tight">
                       {selectedSong?.titulo || customSong}
                     </h3>
@@ -225,21 +225,21 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
 
                   <div className="flex justify-between items-center py-4 border-t border-white/10">
                     <div>
-                      <p className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold">Valor</p>
-                      <p className="text-2xl font-black text-white">
+                      <p className="text-[10px] text-emerald-400 uppercase tracking-[0.2em] font-bold">Valor</p>
+                      <p className="text-2xl font-black text-white font-heading">
                         {donationAmount > 0 ? `R$ ${donationAmount.toFixed(2)}` : "Grátis"}
                       </p>
                     </div>
                     {donationAmount > 0 && (
-                      <div className="bg-primary/20 p-2 rounded-xl">
-                        <Sparkles className="h-6 w-6 text-primary" />
+                      <div className="bg-emerald-500/20 p-2 rounded-xl">
+                        <Sparkles className="h-6 w-6 text-emerald-400" />
                       </div>
                     )}
                   </div>
 
                   {dedication && (
                     <div className="pt-4 border-t border-white/10">
-                      <p className="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-2">Mensagem</p>
+                      <p className="text-[10px] text-emerald-400 uppercase tracking-[0.2em] font-bold mb-2">Mensagem</p>
                       <p className="text-sm italic text-white/80 leading-relaxed">"{dedication}"</p>
                     </div>
                   )}
@@ -253,9 +253,9 @@ export function OrderForm({ artistaId, artistName, onSubmit }) {
                 <Button 
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="h-14 flex-[2] rounded-2xl text-lg font-bold shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]"
+                  className="h-14 flex-[2] rounded-2xl text-lg font-bold shadow-[0_0_20px_rgba(16,185,129,0.4)] bg-emerald-500 text-black hover:bg-emerald-400"
                 >
-                  {isSubmitting ? "Enviando..." : (donationAmount > 0 ? "Pagar e Pedir" : "Enviar Pedido")}
+                  {isSubmitting ? "Enviando..." : (donationAmount > 0 ? "Pagar via PIX" : "Enviar Pedido")}
                 </Button>
               </div>
             </motion.div>

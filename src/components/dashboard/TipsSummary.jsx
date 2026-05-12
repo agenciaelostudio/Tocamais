@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, ArrowUpRight, TrendingUp, Wallet, BarChart3, Zap, ShieldCheck } from 'lucide-react';
+import { DollarSign, TrendingUp, Wallet, BarChart3, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
 import { motion } from 'framer-motion';

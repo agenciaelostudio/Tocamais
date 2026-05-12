@@ -3,12 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { SEOHead } from "@/components/SEOHead";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { MusicCombobox } from "@/components/MusicCombobox";
-import { ArrowLeft, Music, Heart, Instagram, Youtube, Music2, ListMusic, MessageCircleHeart, Briefcase, Users, MapPin } from "lucide-react";
+import { ArrowLeft, Music, Heart, Instagram, Youtube, Music2, ListMusic, Briefcase, Users, MapPin } from "lucide-react";
 import { VotacaoFa } from "@/components/VotacaoFa";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,9 +13,7 @@ import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useSessionId } from "@/hooks/useSessionId";
 import { z } from "zod";
-import { TwoStepPixPaymentDialog } from "@/components/TwoStepPixPaymentDialog";
 import { useLocation } from "react-router-dom";
-import { Sparkles, Loader2 } from "lucide-react";
 import { GuestWelcomeBanner } from "@/components/shared/GuestWelcomeBanner";
 
 const songRequestSchema = z.object({

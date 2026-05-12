@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/integrations/supabase/client';
 import { 
-  DollarSign, TrendingUp, Users, Trophy, Star, Crown, Gem, 
-  Calendar, ArrowUpRight, Wallet, Info, Sparkles, Filter, ShieldCheck, Music
+  DollarSign, TrendingUp, Users, Trophy, Star, Crown, 
+  Calendar, ArrowUpRight, Wallet, Sparkles, Filter, ShieldCheck, Music
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

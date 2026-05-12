@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/integrations/supabase/client';
-import { DollarSign, Send, Calendar, Star, Music, ListMusic, TrendingUp, LayoutDashboard, Wallet, ChevronRight, ArrowRight, MapPin, Clock, AlertCircle, CheckCircle2, QrCode, Plus, Loader2 } from 'lucide-react';
+import { DollarSign, Send, Calendar, Star, Music, LayoutDashboard, Wallet, ChevronRight, Clock, AlertCircle, CheckCircle2, QrCode, Plus, Loader2 } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -212,8 +212,8 @@ export default function ArtistDashboard({ user }) {
                           {pedido.cliente_nome?.[0] || 'F'}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-lg text-white truncate">{pedido.cliente_nome || 'Fã Anônimo'}</p>
-                          <p className="text-2xl font-black text-amber-400 tracking-tighter">
+                          <p className="font-heading font-black text-lg text-white truncate">{pedido.cliente_nome || 'Fã Anônimo'}</p>
+                          <p className="font-heading text-2xl font-black text-amber-400 tracking-tighter">
                             R$ {pedido.valor ? Number(pedido.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '0,00'}
                           </p>
                         </div>
@@ -307,7 +307,7 @@ export default function ArtistDashboard({ user }) {
                             {p.venue_name?.[0]}
                           </div>
                           <div>
-                            <p className="font-bold text-base group-hover/item:text-primary transition-colors">{p.venue_name}</p>
+                            <p className="font-heading font-bold text-base group-hover/item:text-primary transition-colors">{p.venue_name}</p>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
                               <Calendar size={12} className="text-primary/70" />
                               {p.event_date && format(new Date(p.event_date), "dd 'de' MMMM", { locale: ptBR })}
@@ -362,11 +362,11 @@ export default function ArtistDashboard({ user }) {
                             {t.fan_name?.[0] || 'A'}
                           </div>
                           <div>
-                            <p className="font-bold text-sm group-hover/item:text-secondary transition-colors">{t.fan_name || 'Fã Anônimo'}</p>
+                            <p className="font-heading font-bold text-sm group-hover/item:text-secondary transition-colors">{t.fan_name || 'Fã Anônimo'}</p>
                             {t.message && <p className="text-[10px] text-muted-foreground italic truncate max-w-[150px]">"{t.message}"</p>}
                           </div>
                         </div>
-                        <span className="font-black text-secondary text-sm">R$ {t.amount?.toLocaleString('pt-BR')}</span>
+                        <span className="font-heading font-black text-secondary text-sm">R$ {t.amount?.toLocaleString('pt-BR')}</span>
                       </motion.div>
                     ))}
                   </div>
@@ -410,9 +410,9 @@ export default function ArtistDashboard({ user }) {
                             {pedido.cliente_nome?.[0] || 'A'}
                           </div>
                           <div>
-                            <p className="font-black text-base">{pedido.cliente_nome || 'Fã Anônimo'}</p>
+                            <p className="font-heading font-black text-base">{pedido.cliente_nome || 'Fã Anônimo'}</p>
                             <p className="text-xs text-muted-foreground italic">{pedido.musica || 'Gorjeta sem pedido'}</p>
-                            <p className="text-xs text-amber-400 font-black mt-0.5">
+                            <p className="font-heading text-xs text-amber-400 font-black mt-0.5">
                               {pedido.valor ? `R$ ${Number(pedido.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}` : 'Valor não informado'}
                             </p>
                           </div>

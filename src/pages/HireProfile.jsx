@@ -5,8 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {
   ArrowLeft, Star, MapPin, Music, User, Users, LayoutGrid, Mic2,
-  ChevronRight, CheckCircle2, Calendar, DollarSign, Play, Sparkles, Heart,
-  ShieldCheck, Info, Zap
+  ChevronRight, CheckCircle2, Play, Sparkles,
+  ShieldCheck, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
