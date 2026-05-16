@@ -28,9 +28,7 @@ const Home = ({ user }) => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const activeProfile = useActiveProfile(user?.id);
   
-  // Gamification state
-  const [gamification, setGamification] = useState(null);
-  const [badges, setBadges] = useState([]);
+
   
   const isPreviewMode = searchParams.get('preview') === 'true';
 
@@ -57,18 +55,7 @@ const Home = ({ user }) => {
     fetchFavorites();
   }, [user?.id]);
 
-  useEffect(() => {
-    if (!user?.id) return;
-    const loadGamification = async () => {
-      const [gamRes, badgeRes] = await Promise.all([
-        supabase.from("user_gamification").select("*").eq("user_id", user.id).maybeSingle(),
-        supabase.from("user_badges").select("*").eq("user_id", user.id),
-      ]);
-      if (gamRes.data) setGamification(gamRes.data);
-      if (badgeRes.data) setBadges(badgeRes.data);
-    };
-    loadGamification();
-  }, [user?.id]);
+
 
   const fetchArtists = async () => {
     try {
@@ -102,11 +89,6 @@ const Home = ({ user }) => {
   const liveArtists = filteredArtists.filter((a) => a.ativo_ao_vivo);
   const regularArtists = filteredArtists;
 
-  const levelNames = ["Novato", "Iniciante", "Fã Ativo", "Super Fã", "Lendário", "Mestre"];
-  const level = gamification?.level || 1;
-  const xp = gamification?.xp || 0;
-  const nextLevelXp = [100, 300, 700, 1500, 3000, 9999][level - 1] || 100;
-  const progress = Math.min((xp / nextLevelXp) * 100, 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,7 +97,7 @@ const Home = ({ user }) => {
       )}
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-50 bg-[#0f0e12]">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logoTocaMais} alt="Toca Mais" className="h-14 w-auto object-contain" />
@@ -131,10 +113,6 @@ const Home = ({ user }) => {
             />
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
-              <Star className="w-3 h-3 text-primary" />
-              <span className="text-[10px] font-bold text-primary">Nv.{level}</span>
-            </div>
             <NotificationBell userId={user?.id} />
             <Button variant="ghost" size="icon" onClick={() => navigate("/settings")} className="h-9 w-9">
               <Settings className="w-5 h-5" />
@@ -147,29 +125,9 @@ const Home = ({ user }) => {
       </header>
 
       <main className="container mx-auto px-4 pb-24 pt-6">
-        {/* XP Card */}
-        <section className="mb-6">
-          <GlassCard className="border-primary/10">
-            <div className="p-4">
-              <div className="flex justify-between mb-3">
-                <div>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Progresso</p>
-                  <p className="text-lg font-black uppercase italic">{levelNames[level - 1]}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xl font-black text-primary">{xp}</p>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">XP Total</p>
-                </div>
-              </div>
-              <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-          </GlassCard>
-        </section>
 
         {/* Quick Actions */}
-        <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <section className="grid grid-cols-2 gap-3 mb-8">
           <GlassCard className="cursor-pointer hover:border-primary/30 transition-all" onClick={() => navigate("/explore")}>
             <div className="p-6 flex flex-col items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -184,22 +142,6 @@ const Home = ({ user }) => {
                 <Radio className="w-6 h-6 text-secondary" />
               </div>
               <p className="font-bold text-sm uppercase italic">Ao Vivo</p>
-            </div>
-          </GlassCard>
-          <GlassCard className="cursor-pointer hover:border-yellow-500/30 transition-all" onClick={() => navigate("/explore")}>
-            <div className="p-6 flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 flex items-center justify-center">
-                <Trophy className="w-6 h-6 text-yellow-500" />
-              </div>
-              <p className="font-bold text-sm uppercase italic">Ranking</p>
-            </div>
-          </GlassCard>
-          <GlassCard className="cursor-pointer hover:border-primary/30 transition-all" onClick={() => navigate("/explore")}>
-            <div className="p-6 flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <Target className="w-6 h-6 text-primary" />
-              </div>
-              <p className="font-bold text-sm uppercase italic">Missões</p>
             </div>
           </GlassCard>
         </section>

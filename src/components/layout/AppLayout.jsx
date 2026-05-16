@@ -25,7 +25,7 @@ export default function AppLayout({ userRole, user }) {
       )}
 
       <main className={cn(
-        "min-h-screen relative z-10 pb-32 pt-16 transition-all duration-500",
+        "min-h-screen relative z-10 pb-32 pt-24 transition-all duration-500",
         !isGuest ? "lg:pl-72" : "lg:pl-0"
       )}>
         <div className="p-4 md:p-6 lg:p-8 pt-8 max-w-7xl mx-auto">

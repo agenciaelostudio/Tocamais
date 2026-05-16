@@ -15,10 +15,10 @@ import logoTocaMais from "@/assets/logo-tocamais.png";
 
 import slidePedidos from "@/assets/slide-pedidos.jpg";
 import slideGorjetas from "@/assets/slide-gorjetas.jpg";
-import slideGamificacao from "@/assets/slide-gamificacao.jpg";
 import slideRadar from "@/assets/slide-radar.jpg";
 import slideInteracao from "@/assets/slide-interacao.jpg";
 import slidePerfis from "@/assets/slide-perfis.jpg";
+import tableTent from "@/assets/table-tent.png";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Modals - placeholders since they might be missing in target
@@ -64,7 +64,6 @@ const Landing = () => {
   const featureSlides = [
     { image: slidePedidos, tag: "Pedidos de Música", title: "Peça a Música que Quiser", desc: "Clientes escolhem o repertório em tempo real. Artistas recebem os pedidos organizados. Bares lotam com o público engajado." },
     { image: slideGorjetas, tag: "Gorjetas via PIX", title: "Apoie Artistas Direto pelo Celular", desc: "Envie gorjetas instantâneas via QR Code. Artistas monetizam cada show. Estabelecimentos atraem mais talentos." },
-    { image: slideGamificacao, tag: "Gamificação", title: "Ganhe Pontos e Benefícios", desc: "Clientes acumulam pontos e desbloqueiam recompensas. Artistas sobem no ranking. Bares ganham visibilidade com público ativo." },
     { image: slideRadar, tag: "Radar de Shows", title: "Descubra Shows Perto de Você", desc: "Clientes encontram shows ao vivo no mapa. Artistas são descobertos por novos clientes. Bares divulgam eventos automaticamente." },
     { image: slideInteracao, tag: "Votação & Interação", title: "Público Decide a Próxima Música", desc: "Votações ao vivo no telão. Clientes participam ativamente. Artistas conectam com a plateia. Bares criam experiências únicas." },
     { image: slidePerfis, tag: "3 Perfis, 1 Plataforma", title: "Para Artistas, Clientes e Bares", desc: "Artistas gerenciam shows e recebem. Clientes pedem e votam. Estabelecimentos contratam e promovem eventos." },
@@ -101,41 +100,8 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
-      {/* ===== NAVBAR ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <img src={logoTocaMais} alt="Toca Mais" className="h-[60px] w-auto" />
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-            {[
-              { label: "Como funciona", id: "como-funciona" },
-              { label: "Para quem", id: "para-quem" },
-              { label: "Artistas", id: "para-artistas" },
-              { label: "Planos", id: "planos" },
-            ].map((link) => (
-              <button
-                key={link.id}
-                onClick={() => document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" })}
-                className="text-sm font-bold text-muted-foreground hover:text-white transition-colors uppercase tracking-widest"
-              >
-                {link.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/explore")}
-              className="px-6 py-2 rounded-full text-xs font-black bg-primary text-white hover:bg-primary/90 transition-all uppercase tracking-[0.2em]"
-            >
-              Acessar App
-            </button>
-          </div>
-        </div>
-      </nav>
-
       {/* ===== HERO ===== */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-32 md:pt-24">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full opacity-20 blur-[120px] bg-primary" />
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full opacity-15 blur-[120px] bg-secondary" />
@@ -144,14 +110,10 @@ const Landing = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <motion.div initial="hidden" animate="visible" className="max-w-xl">
-              <motion.div custom={0} variants={fadeIn} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 bg-white/5 border border-white/10 text-white/70">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                Plataforma N° 1 para música ao vivo
-              </motion.div>
 
-              <motion.h1 custom={1} variants={fadeIn} className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic">
+              <motion.h1 custom={1} variants={fadeIn} className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-8 uppercase italic">
                 O Palco <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-secondary">
+                <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary pr-8">
                   é todo seu
                 </span>
               </motion.h1>
@@ -173,11 +135,12 @@ const Landing = () => {
                   className="group flex items-center justify-center gap-3 h-16 px-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 font-black text-lg transition-all backdrop-blur-md"
                 >
                   <Search className="w-5 h-5" />
-                  Explorar
                 </button>
               </motion.div>
 
-              <motion.div custom={4} variants={fadeIn} className="flex items-center gap-8">
+
+
+              <motion.div custom={5} variants={fadeIn} className="flex items-center gap-8 mt-12">
                 {[
                   { value: "500+", label: "artistas" },
                   { value: "10k+", label: "pedidos/mês" },
@@ -195,7 +158,7 @@ const Landing = () => {
             </motion.div>
 
             {/* App Mockup */}
-            <div className="hidden lg:flex justify-center items-center" style={{ perspective: "1200px" }}>
+            <div className="hidden lg:flex justify-center items-center relative" style={{ perspective: "1200px" }}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -204,6 +167,7 @@ const Landing = () => {
                   transform: "rotateY(-14deg) rotateX(6deg) rotateZ(-4deg)",
                   transformStyle: "preserve-3d",
                 }}
+                className="scale-75 xl:scale-100 origin-center"
               >
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-primary/20 rounded-full blur-[100px] -z-10" />
                 <div className="relative animate-[float_4s_ease-in-out_infinite]">
@@ -238,7 +202,7 @@ const Landing = () => {
       </section>
 
       {/* ===== FEATURES CAROUSEL ===== */}
-      <section className="relative h-[600px] overflow-hidden">
+      <section id="recursos" className="relative h-[600px] overflow-hidden scroll-mt-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -273,7 +237,7 @@ const Landing = () => {
       </section>
 
       {/* ===== COMO FUNCIONA ===== */}
-      <section id="como-funciona" className="py-32 px-6">
+      <section id="como-funciona" className="py-32 px-6 scroll-mt-16">
         <div className="max-w-7xl mx-auto text-center mb-20">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-4">Experiência Única</p>
           <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter">
@@ -300,7 +264,7 @@ const Landing = () => {
       </section>
 
       {/* ===== PLANOS ===== */}
-      <section id="planos" className="py-32 bg-white/5 backdrop-blur-3xl border-y border-white/5">
+      <section id="planos" className="py-32 bg-white/5 backdrop-blur-3xl scroll-mt-16">
         <div className="max-w-7xl mx-auto px-6 text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-4">Planos para <span className="text-primary">Evoluir</span></h2>
           <p className="text-muted-foreground text-xl font-medium">Escolha a melhor opção para sua trajetória.</p>
@@ -333,7 +297,7 @@ const Landing = () => {
 
 
       {/* ===== FAQ ===== */}
-      <section className="py-32 px-6 border-t border-white/5">
+      <section id="faq" className="py-32 px-6 border-t border-white/5 scroll-mt-16">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter mb-4">Perguntas <span className="text-primary">Frequentes</span></h2>
@@ -358,6 +322,92 @@ const Landing = () => {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      {/* ===== PHYSICAL EXPERIENCE ===== */}
+      <section className="py-24 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-16 items-center">
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-primary/20 blur-[120px] rounded-full -z-10" />
+              <img 
+                src={tableTent} 
+                alt="Toca Mais no seu bar" 
+                className="w-full h-auto drop-shadow-2xl lg:scale-110 origin-left"
+              />
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="max-w-xl"
+            >
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
+                Onde o Digital <br />
+                <span className="text-secondary">Encontra o Palco</span>
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                Transforme cada mesa em um ponto de interação. Com nossos displays físicos, seus clientes acessam o repertório e fazem pedidos em segundos, sem baixar nada.
+              </p>
+              <ul className="space-y-4 mb-10">
+                {[
+                  "Aumento imediato nas gorjetas",
+                  "Engajamento total do público",
+                  "Gestão simplificada de pedidos",
+                  "Experiência premium para o cliente"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 font-bold uppercase italic text-sm tracking-widest">
+                    <Check className="w-5 h-5 text-secondary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== FINAL CTA BANNER ===== */}
+      <section className="py-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-[2.5rem] bg-primary p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 group"
+          >
+            {/* Decorative circles */}
+            <div className="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700" />
+            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-black/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700" />
+
+            <div className="relative z-10 max-w-2xl text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-xl">
+                  <Music className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-3xl md:text-4xl font-black uppercase italic tracking-tighter text-white">
+                  Toca Mais
+                </h3>
+              </div>
+              <p className="text-white/90 text-lg md:text-xl font-bold leading-tight">
+                Um aplicativo criado para conectar os artistas da música ao-vivo com seu público durante o show, para receber pedidos e gorjetas.
+              </p>
+            </div>
+
+            <button 
+              onClick={() => navigate("/explore")}
+              className="relative z-10 h-16 px-10 rounded-2xl bg-white text-primary font-black text-lg uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-black/20"
+            >
+              Fale com a gente
+            </button>
+          </motion.div>
         </div>
       </section>
 
