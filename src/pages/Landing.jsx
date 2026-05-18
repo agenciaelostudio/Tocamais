@@ -82,7 +82,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white text-black font-sans">
       {/* ===== HERO ===== */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-32 md:pt-24 bg-white text-black">
+      <section className="relative min-h-screen flex items-center pt-32 md:pt-24 bg-white text-black">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <ParticleBackground className="absolute inset-0 z-0" />
 
@@ -91,7 +91,7 @@ const Landing = () => {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <motion.div initial="hidden" animate="visible" className="max-w-xl">
+            <motion.div initial="hidden" animate="visible" className="max-w-xl relative z-20">
 
               <motion.h1 custom={1} variants={fadeIn} className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-8 uppercase italic relative -top-8">
                 O Palco <br />
@@ -152,13 +152,13 @@ const Landing = () => {
         </div>
 
         {/* Absolute Singer Image touching the bottom */}
-        <div className="absolute bottom-0 right-[300px] hidden lg:block w-[800px] h-[1050px] z-10">
+        <div className="absolute -bottom-10 right-[300px] hidden lg:block w-[900px] h-[1150px] z-10">
           <img src={cantoraImg} alt="Cantora" className="w-full h-full object-contain object-bottom" />
         </div>
       </section>
 
       {/* ===== COMO FUNCIONA ===== */}
-      <section id="como-funciona" className="py-32 px-6 scroll-mt-16 bg-[#280c41] text-white">
+      <section id="como-funciona" className="py-32 px-6 scroll-mt-16 bg-[#280c41] text-white relative z-20">
         <div className="max-w-7xl mx-auto text-center mb-20">
           <p className="text-lg font-black uppercase tracking-[0.4em] text-white/80 mb-4">Experiência Única</p>
           <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-secondary" style={{ textShadow: '2px 2px 4px rgba(55, 65, 81, 0.9)' }}>
