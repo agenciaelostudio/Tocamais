@@ -152,7 +152,7 @@ const Landing = () => {
         </div>
 
         {/* Absolute Singer Image touching the bottom */}
-        <div className="absolute -bottom-10 right-[300px] hidden lg:block w-[900px] h-[1150px] z-10">
+        <div className="absolute -bottom-10 right-[150px] hidden lg:block w-[800px] h-[1050px] z-10">
           <img src={cantoraImg} alt="Cantora" className="w-full h-full object-contain object-bottom" />
         </div>
       </section>
