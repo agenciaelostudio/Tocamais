@@ -16,7 +16,7 @@ const roles = [
   {
     id: 'bar_owner',
     icon: Beer,
-    title: 'Dono de Bar',
+    title: 'Casa de Show',
     desc: 'Contrate artistas para o seu estabelecimento',
     gradient: 'from-primary to-purple-400',
   },
