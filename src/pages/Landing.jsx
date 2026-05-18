@@ -264,11 +264,11 @@ const Landing = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-primary/20 blur-[120px] rounded-full -z-10" />
+
               <img
                 src={tableTent}
                 alt="Toca Mais no seu bar"
-                className="w-full h-auto drop-shadow-2xl lg:scale-110 origin-left"
+                className="max-w-[450px] w-full h-auto drop-shadow-2xl origin-left mx-auto"
               />
             </motion.div>
 
