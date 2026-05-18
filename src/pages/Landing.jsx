@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import logoTocaMais from "@/assets/logo-tocamais.png";
 import tableTent from "@/assets/table-tent.png";
-import cantoraImg from "@/assets/cantora.png";
+import cantoraImg from "@/assets/Cantora.png";
 import { motion, AnimatePresence } from "framer-motion";
 import ParticleBackground from "@/components/shared/ParticleBackground";
 
