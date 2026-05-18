@@ -91,13 +91,13 @@ const Home = ({ user }) => {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a090b] text-white">
       {showOnboarding && (
         <OnboardingWizard userType={activeProfile.activeType} userName={user?.full_name} onComplete={() => setShowOnboarding(false)} />
       )}
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0f0e12]">
+      <header className="sticky top-0 z-50 bg-[#0a090b]/80 backdrop-blur-md border-b border-white/10 text-white">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logoTocaMais} alt="Toca Mais" className="h-14 w-auto object-contain" />
@@ -154,7 +154,7 @@ const Home = ({ user }) => {
               placeholder="Buscar artistas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-14 pl-12 bg-white/5 border-white/5 rounded-2xl focus-visible:ring-primary/20 text-lg font-bold"
+              className="h-14 pl-12 bg-white/5 border-white/10 rounded-2xl focus-visible:ring-primary/20 text-lg font-bold text-white"
             />
           </div>
         </div>

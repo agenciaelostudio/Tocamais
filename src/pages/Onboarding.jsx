@@ -30,7 +30,7 @@ const roles = [
   {
     id: 'fan',
     icon: Heart,
-    title: 'Publico',
+    title: 'Contratante particular',
     desc: 'Descubra artistas e acompanhe shows',
     gradient: 'from-pink-500 to-rose-400',
   },
@@ -243,7 +243,7 @@ export default function Onboarding({ user, onComplete, authError }) {
         className="relative z-10 w-full max-w-2xl mx-4"
       >
         <div className="text-center mb-10 flex flex-col items-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
@@ -251,21 +251,21 @@ export default function Onboarding({ user, onComplete, authError }) {
           >
             <Logo size="5xl" />
           </motion.div>
-          
+
           <div className="relative z-20 flex flex-col items-center">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-4xl md:text-5xl lg:text-6xl font-heading font-black tracking-tighter text-foreground mb-3 leading-none"
             >
-              {isGuest 
+              {isGuest
                 ? authMode === 'signup' ? 'O PALCO É SEU' : 'BEM-VINDO DE VOLTA'
                 : 'QUASE LÁ'
               }
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -289,9 +289,9 @@ export default function Onboarding({ user, onComplete, authError }) {
             {[1, 2].map((s) => (
               <div key={s} className="relative flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
                 {s <= step && (
-                  <motion.div 
+                  <motion.div
                     layoutId="progress-bar"
-                    className="absolute inset-0 bg-gradient-to-r from-primary to-secondary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" 
+                    className="absolute inset-0 bg-gradient-to-r from-primary to-secondary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"
                   />
                 )}
               </div>
@@ -306,7 +306,7 @@ export default function Onboarding({ user, onComplete, authError }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="space-y-6 bg-card/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
+              className="space-y-6 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
             >
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -336,7 +336,7 @@ export default function Onboarding({ user, onComplete, authError }) {
                   />
                 </div>
               </div>
-              
+
               <div className="flex justify-end px-2">
                 <button
                   type="button"
@@ -351,7 +351,7 @@ export default function Onboarding({ user, onComplete, authError }) {
                 <AnimatedButton
                   onClick={handleGuestLogin}
                   disabled={loading}
-                  className="h-16 rounded-2xl bg-foreground text-background font-black text-lg tracking-tight hover:scale-[1.02] transition-all shadow-2xl"
+                  className="h-16 rounded-2xl bg-black/40 border border-white/10 text-white font-black text-lg tracking-tight hover:scale-[1.02] transition-all shadow-2xl"
                 >
                   {loading ? 'Sincronizando...' : 'ENTRAR NO PALCO'}
                 </AnimatedButton>
@@ -381,23 +381,22 @@ export default function Onboarding({ user, onComplete, authError }) {
                           setSelectedRole(role.id);
                           setStep(2);
                         }}
-                        className={`group relative w-full p-6 rounded-[2rem] border transition-all duration-500 flex items-center gap-6 text-left overflow-hidden ${
-                          selectedRole === role.id
+                        className={`group relative w-full p-6 rounded-[2rem] border transition-all duration-500 flex items-center gap-6 text-left overflow-hidden ${selectedRole === role.id
                             ? 'border-primary/50 bg-primary/10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.1)]'
-                            : 'border-white/5 bg-card/40 backdrop-blur-xl hover:border-white/20'
-                        }`}
+                            : 'border-white/5 bg-black/40 backdrop-blur-xl hover:border-white/20'
+                          }`}
                       >
                         <div className={`absolute inset-0 bg-gradient-to-r ${role.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity`} />
-                        
+
                         <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${role.gradient} flex items-center justify-center shrink-0 shadow-xl relative z-10 group-hover:scale-110 transition-transform duration-500`}>
                           <role.icon className="w-8 h-8 text-white" />
                         </div>
-                        
+
                         <div className="relative z-10">
                           <p className="text-xl font-heading font-black tracking-tight text-foreground">{role.title}</p>
                           <p className="text-sm text-muted-foreground font-medium">{role.desc}</p>
                         </div>
-                        
+
                         <div className="ml-auto relative z-10 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-4 transition-all duration-500">
                           <ArrowRight className="w-6 h-6 text-primary" />
                         </div>
@@ -413,12 +412,12 @@ export default function Onboarding({ user, onComplete, authError }) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6 bg-card/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
+                  className="space-y-6 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
                 >
                   <h2 className="text-xs font-black uppercase tracking-[0.4em] text-center text-primary mb-4">
                     {isGuest ? 'Últimos Detalhes' : 'Perfil Artístico'}
                   </h2>
-                  
+
                   <div className="space-y-6">
                     {isGuest && (
                       <div className="space-y-4">
@@ -476,7 +475,7 @@ export default function Onboarding({ user, onComplete, authError }) {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">WhatsApp</Label>
                       <Input
@@ -486,7 +485,7 @@ export default function Onboarding({ user, onComplete, authError }) {
                         className="h-14 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium px-6"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-2">Bio / Descrição</Label>
                       <Textarea
@@ -497,7 +496,7 @@ export default function Onboarding({ user, onComplete, authError }) {
                         className="rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 text-base font-medium p-6 resize-none"
                       />
                     </div>
-                    
+
                     <div className="flex gap-4 pt-6">
                       <Button variant="ghost" onClick={() => setStep(1)} className="h-16 flex-1 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 font-bold">
                         Voltar

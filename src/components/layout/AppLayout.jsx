@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { BottomNav } from './BottomNav';
@@ -8,10 +8,11 @@ import { cn } from '@/lib/utils';
 
 export default function AppLayout({ userRole, user }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
   const isGuest = !user;
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-[#0a090b] relative">
       <ParticleBackground />
       <Header user={user} onMenuClick={() => setMobileMenuOpen(true)} />
       
@@ -25,12 +26,17 @@ export default function AppLayout({ userRole, user }) {
       )}
 
       <main className={cn(
-        "min-h-screen relative z-10 pb-32 pt-24 transition-all duration-500",
+        "min-h-screen relative z-10 pt-24 transition-all duration-500",
+        location.pathname !== '/landing' && "pb-32",
         !isGuest ? "lg:pl-72" : "lg:pl-0"
       )}>
-        <div className="p-4 md:p-6 lg:p-8 pt-8 max-w-7xl mx-auto">
+        {location.pathname === '/landing' ? (
           <Outlet />
-        </div>
+        ) : (
+          <div className="p-4 md:p-6 lg:p-8 pt-8 max-w-7xl mx-auto">
+            <Outlet />
+          </div>
+        )}
       </main>
 
       {!isGuest && (

@@ -29,39 +29,35 @@ export default function Header({ user, onMenuClick }) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 z-50 bg-[#0f0e12]/80 backdrop-blur-md border-b border-white/5 px-4 md:px-8 flex items-center">
+    <header className="fixed top-0 left-0 right-0 h-20 z-50 bg-black/90 backdrop-blur-md border-b border-white/5 px-4 md:px-8 flex items-center">
       {/* Left side: Logo & Menu */}
       <div className="flex items-center gap-4 flex-1">
         {!isLandingPage && (
-          <button 
+          <button
             onClick={onMenuClick}
             className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors"
           >
             <Menu size={20} className="text-white" />
           </button>
         )}
-        
-        <div 
-          className="flex items-center cursor-pointer" 
-          onClick={() => {
-            if (isLandingPage) {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-              navigate('/landing');
-            }
-          }}
-        >
-          <Logo size="lg" />
-        </div>
+
       </div>
 
       {/* Center: Navigation Links (Landing Page only) */}
-      <div className="hidden md:flex items-center justify-center gap-10 flex-[2]">
+      <div className="hidden md:flex items-center justify-center gap-10 flex-[2] relative">
+        {isLandingPage && (
+          <div
+            className="w-40 h-40 cursor-pointer flex items-center justify-center absolute -left-32"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            <Logo size="2xl" />
+          </div>
+        )}
         {isLandingPage && landingLinks.map((link) => (
           <button
             key={link.id}
             onClick={() => handleLinkClick(link.id)}
-            className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 hover:text-white transition-colors"
+            className="text-xs font-black uppercase tracking-[0.2em] text-white hover:text-white/80 transition-colors"
           >
             {link.label}
           </button>
@@ -71,9 +67,9 @@ export default function Header({ user, onMenuClick }) {
       {/* Right side: Action Button or Profile */}
       <div className="flex items-center justify-end gap-4 flex-1">
         {isLandingPage ? (
-          <Link 
-            to="/explore"
-            className="px-6 py-2.5 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
+          <Link
+            to="/dashboard"
+            className="px-8 py-3 bg-primary rounded-xl text-xs font-black uppercase tracking-widest text-white hover:scale-105 transition-transform"
           >
             Entrar
           </Link>
@@ -98,7 +94,7 @@ export default function Header({ user, onMenuClick }) {
             <button
               key={link.id}
               onClick={() => handleLinkClick(link.id)}
-              className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 hover:text-white transition-colors whitespace-nowrap"
+              className="text-xs font-black uppercase tracking-[0.2em] text-white hover:text-white/80 transition-colors whitespace-nowrap"
             >
               {link.label}
             </button>
