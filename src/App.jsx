@@ -91,7 +91,7 @@ const AuthenticatedApp = () => {
         <Route path="/landing" element={<Landing />} />
 
         {/* Private Routes requiring authentication */}
-        <Route path="/" element={user ? <Dashboard user={user} /> : <Navigate to="/landing" />} />
+        <Route path="/" element={<Navigate to="/landing" replace />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/landing" />} />
         <Route path="/contratar/:artistaId" element={user ? <Contratacao user={user} /> : <Navigate to="/onboarding" />} />
         <Route path="/proposals" element={user ? <Proposals user={user} /> : <Navigate to="/onboarding" />} />
